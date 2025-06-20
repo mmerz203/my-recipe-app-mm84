@@ -4,9 +4,7 @@ A personal digital cookbook for preserving, organizing, and sharing cherished fa
 
 ## ✨ Live Demo
 
-Experience the app live here: **[Your Netlify Live URL Here](https://[your-site-name].netlify.app/)**
-
-*(Replace `[Your Netlify Live URL Here]` with the actual URL provided by Netlify, e.g., `https://r3cipevault.netlify.app`)*
+Experience the app live here: **https://r3cipevault.netlify.app/**
 
 ## 🚀 Features
 
@@ -164,7 +162,8 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 This project is Unlicensed by default. If you wish to license your code, you can add a LICENSE file to the root of your project. The MIT License is a common and permissive choice.
 
 📞 Contact
-Winsome Keeper - [Your Email Address]
+Winsome Keeper - email (coming soon)
+
 
 
 &lt;br/>
