@@ -21,7 +21,6 @@ export const RecipeProvider = ({ children }) => {
     // Fetch recipes from both public and private collections
     useEffect(() => {
         if (!db || !userId || !authReady) {
-            // console.log("Waiting for DB or userId or authReady to be available for recipe fetch.");
             return;
         }
 
@@ -30,10 +29,11 @@ export const RecipeProvider = ({ children }) => {
 
         const fetchRecipes = async () => {
             try {
-                const publicRecipesRef = collection(db, `artifacts/${appId}/public/data/recipes`);
-                const privateRecipesRef = collection(db, `artifacts/${appId}/users/${userId}/recipes`);
+                // Corrected collection calls for public recipes
+                const publicRecipesRef = collection(db, 'artifacts', appId, 'public', 'data', 'recipes');
+                // Corrected collection calls for private recipes
+                const privateRecipesRef = collection(db, 'artifacts', appId, 'users', userId, 'recipes');
 
-                // Listen to public recipes
                 const unsubscribePublic = onSnapshot(publicRecipesRef, (snapshot) => {
                     const publicRecipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'public' }));
                     setRecipes(prevRecipes => {
@@ -41,7 +41,7 @@ export const RecipeProvider = ({ children }) => {
                         const updatedRecipes = prevRecipes.map(r => {
                             const updatedPublic = publicRecipes.find(pr => pr.id === r.id);
                             return updatedPublic ? { ...r, ...updatedPublic } : r;
-                        }).filter(r => publicRecipes.some(pr => pr.id === r.id) || r.type === 'private'); // Keep private if not updated publicly
+                        }).filter(r => publicRecipes.some(pr => pr.id === r.id) || r.type === 'private');
                         return [...updatedRecipes, ...newRecipes];
                     });
                 }, (err) => {
@@ -49,7 +49,6 @@ export const RecipeProvider = ({ children }) => {
                     setError("Failed to load public recipes.");
                 });
 
-                // Listen to private recipes
                 const unsubscribePrivate = onSnapshot(privateRecipesRef, (snapshot) => {
                     const privateRecipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'private' }));
                     setRecipes(prevRecipes => {
@@ -57,7 +56,7 @@ export const RecipeProvider = ({ children }) => {
                         const updatedRecipes = prevRecipes.map(r => {
                             const updatedPrivate = privateRecipes.find(pr => pr.id === r.id);
                             return updatedPrivate ? { ...r, ...updatedPrivate } : r;
-                        }).filter(r => privateRecipes.some(pr => pr.id === r.id) || r.type === 'public'); // Keep public if not updated privately
+                        }).filter(r => privateRecipes.some(pr => pr.id === r.id) || r.type === 'public');
                         return [...updatedRecipes, ...newRecipes];
                     });
                 }, (err) => {
@@ -90,13 +89,17 @@ export const RecipeProvider = ({ children }) => {
         }
         setLoading(true);
         try {
-            const collectionPath = recipeData.isPublic ? `artifacts/${appId}/public/data/recipes` : `artifacts/${appId}/users/${userId}/recipes`;
-            await addDoc(collection(db, collectionPath), {
+            // Corrected collection call for addDoc
+            const collectionRef = recipeData.isPublic ?
+                collection(db, 'artifacts', appId, 'public', 'data', 'recipes') :
+                collection(db, 'artifacts', appId, 'users', userId, 'recipes');
+
+            await addDoc(collectionRef, {
                 ...recipeData,
                 createdAt: Date.now(),
-                userId: userId // Store the creator's userId
+                userId: userId
             });
-            setError(null); // Clear previous errors on success
+            setError(null);
         } catch (e) {
             console.error("Error adding document: ", e);
             setError(`Failed to add recipe: ${e.message || 'An unknown error occurred.'}`);
@@ -113,10 +116,13 @@ export const RecipeProvider = ({ children }) => {
         }
         setLoading(true);
         try {
-            const collectionPath = isPublic ? `artifacts/${appId}/public/data/recipes` : `artifacts/${appId}/users/${userId}/recipes`;
-            const recipeRef = doc(db, collectionPath, recipeId);
+            // Corrected doc call for updateDoc
+            const recipeRef = isPublic ?
+                doc(db, 'artifacts', appId, 'public', 'data', 'recipes', recipeId) :
+                doc(db, 'artifacts', appId, 'users', userId, 'recipes', recipeId);
+
             await updateDoc(recipeRef, updatedData);
-            setError(null); // Clear previous errors on success
+            setError(null);
         } catch (e) {
             console.error("Error updating document: ", e);
             setError(`Failed to update recipe: ${e.message || 'An unknown error occurred.'}`);
@@ -133,10 +139,14 @@ export const RecipeProvider = ({ children }) => {
         }
         setLoading(true);
         try {
-            const collectionPath = isPublic ? `artifacts/${appId}/public/data/recipes` : `artifacts/${appId}/users/${userId}/recipes`;
-            await deleteDoc(doc(db, collectionPath, recipeId));
-            setRecipes(prevRecipes => prevRecipes.filter(r => r.id !== recipeId)); // Optimistic update
-            setError(null); // Clear previous errors on success
+            // Corrected doc call for deleteDoc
+            const docRefToDelete = isPublic ?
+                doc(db, 'artifacts', appId, 'public', 'data', 'recipes', recipeId) :
+                doc(db, 'artifacts', appId, 'users', userId, 'recipes', recipeId);
+
+            await deleteDoc(docRefToDelete);
+            setRecipes(prevRecipes => prevRecipes.filter(r => r.id !== recipeId));
+            setError(null);
         } catch (e) {
             console.error("Error removing document: ", e);
             setError(`Failed to delete recipe: ${e.message || 'An unknown error occurred.'}`);
@@ -144,6 +154,7 @@ export const RecipeProvider = ({ children }) => {
             setLoading(false);
         }
     }, [db, userId]);
+
 
     return (
         <RecipeContext.Provider value={{ recipes, loading, error, addRecipe, updateRecipe, deleteRecipe }}>

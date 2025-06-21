@@ -1,68 +1,125 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* src/index.css */
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+/* Tailwind CSS Directives - CRITICAL */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Global Base Styles and Sticky Footer Setup - CRITICAL */
+html, body, #root {
+    height: 100%; /* Ensure html, body, and root div take full height */
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Prevents horizontal scrollbar issues */
+    box-sizing: border-box; /* Includes padding and border in element's total width/height */
 }
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+    font-family: "Inter", sans-serif; /* Your chosen font */
+    min-height: 100vh; /* Ensure body is at least full viewport height */
+    overflow-y: auto; /* Allow vertical scrolling if content overflows */
+    display: flex;         /* Make body a flex container */
+    flex-direction: column; /* Stack children vertically */
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Styles for the #root div where your React app mounts */
+#root {
+  flex-grow: 1; /* Allow the React app content to grow and push the footer down */
+  display: flex; /* Make root a flex container too, useful for app's internal layout */
+  flex-direction: column; /* Stack React app children vertically */
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Styles for the footer - Moved from inline HTML style */
+footer {
+    width: 100%;
+    text-align: center;
+    padding-top: 40px; /* Space above footer content */
+    padding-bottom: 20px; /* Space below footer content */
+    color: #6b7280; /* Text color */
+    font-size: 0.9em; /* Font size */
+    background-color: #f0f0f0; /* Light background for the footer itself */
+    flex-shrink: 0; /* Prevent footer from shrinking if content is too large */
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Custom Shadow Classes (copied from original giant block) */
+  .shadow-md {
+box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+.shadow-lg {
+box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+.shadow-xl {
+box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+.shadow-inner {
+box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Custom Border-Radius Classes (copied from original giant block) */
+.rounded-xl {
+    border-radius: 0.75rem;
+}
+.rounded-2xl {
+    border-radius: 1rem;
+}
+
+/* Custom Transition and Transform Classes (copied from original giant block) */
+.transition, .transition-all {
+    transition-property: all;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+.transform {
+    transform: var(--tw-transform);
+}
+.scale-102:hover {
+    --tw-scale-x: 1.02;
+    --tw-scale-y: 1.02;
+    transform: var(--tw-transform);
+}
+
+/* Explicitly ensure no animations on home component elements (important for consistency) */
+.HomeComponent h1, .HomeComponent p, .HomeComponent button {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+}
+/* Explicitly ensure no animations on recipe list items (from original giant block) */
+.RecipeList .group {
+    transition: none !important;
+    transform: none !important;
+}
+.RecipeList .group:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+.RecipeList .group img {
+    transition: none !important;
+    transform: none !important;
+}
+
+/* General Responsive Adjustments (from original giant block) */
+@media (max-width: 640px) {
+    .flex-col.sm\:flex-row {
+        flex-direction: column !important;
+    }
+    .space-y-4.sm\:space-y-0 {
+        --tw-space-y-reverse: 0;
+        margin-top: calc(1rem * var(--tw-space-y-reverse)) !important;
+        margin-bottom: calc(1rem * (1 - var(--tw-space-y-reverse))) !important;
+    }
+    .sm\:space-x-6 {
+        --tw-space-x-reverse: 0;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    .sm\:w-auto {
+        width: 100% !important;
+    }
+    .HomeComponent button {
+        width: 100%;
+    }
+}
+/* Custom text shadow for theme preview (from original giant block) */
+.text-shadow-sm {
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);
 }
