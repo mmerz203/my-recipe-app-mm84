@@ -1,21 +1,13 @@
 // src/components/ServingSizeConverter.jsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { parseFraction, formatFraction, parseIngredient } from '../utils/helpers';
+import { parseFraction, formatFraction, parseIngredient } from '../utils/helpers'; // Import helpers functions
 
 const ServingSizeConverter = ({ ingredients, originalServings }) => {
     const [currentServings, setCurrentServings] = useState(originalServings || 1);
     const [convertedIngredients, setConvertedIngredients] = useState([]);
 
-    // IMPORTANT: Added `convertIngredients` to the dependency array of this useEffect
-    useEffect(() => {
-        const safeOriginalServings = parseFloat(originalServings) || 1;
-        if (ingredients) {
-            setCurrentServings(safeOriginalServings);
-            convertIngredients(safeOriginalServings, safeOriginalServings);
-        }
-    }, [ingredients, originalServings, convertIngredients]);
-
-    // IMPORTANT: Added `parseFraction`, `formatFraction`, `parseIngredient` to the dependency array of this useCallback
+    // --- MOVED: Function to convert ingredients based on new serving size ---
+    // Defined BEFORE useEffect to prevent "Cannot access before initialization" error
     const convertIngredients = useCallback((newServings, initialServings) => {
         const safeInitialServings = parseFloat(initialServings) || 1;
         if (!ingredients || newServings <= 0) {
@@ -45,7 +37,18 @@ const ServingSizeConverter = ({ ingredients, originalServings }) => {
             }
         });
         setConvertedIngredients(newConverted);
-    }, [ingredients, parseFraction, formatFraction, parseIngredient]);
+    }, [ingredients, parseFraction, formatFraction, parseIngredient]); // Dependencies for useCallback
+
+
+    // --- useEffect (now calls convertIngredients after its definition) ---
+    useEffect(() => {
+        const safeOriginalServings = parseFloat(originalServings) || 1;
+        if (ingredients) {
+            setCurrentServings(safeOriginalServings);
+            convertIngredients(safeOriginalServings, safeOriginalServings);
+        }
+    }, [ingredients, originalServings, convertIngredients]); // Added convertIngredients to dependency array
+
 
     const handleServingsChange = (e) => {
         const value = e.target.value;
@@ -102,4 +105,4 @@ const ServingSizeConverter = ({ ingredients, originalServings }) => {
     );
 };
 
-export default ServingSizeConverter; // Add this line
+export default ServingSizeConverter;

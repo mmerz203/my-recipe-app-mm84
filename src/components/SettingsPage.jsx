@@ -1,9 +1,23 @@
 // src/components/SettingsPage.jsx
-import React, { useContext } from 'react';
-import { UserPreferencesContext } from '../contexts/UserPreferencesContext'; // Import UserPreferencesContext
+import React, { useContext, useState, useEffect, useRef } from 'react'; // <--- CRITICAL: useState, useEffect, useRef MUST BE IMPORTED HERE
+import { UserPreferencesContext } from '../contexts/UserPreferencesContext';
 
 const SettingsPage = ({ onBack }) => {
     const { preferences, updatePreferences } = useContext(UserPreferencesContext);
+
+    // Local state for input fields to ensure smooth typing
+    const [cookbookNameInput, setCookbookNameInput] = useState(preferences.cookbookName || '');
+    const [userNameInput, setUserNameInput] = useState(preferences.userName || '');
+
+    // Sync local state with preferences from context when preferences change (e.g., loaded from Firestore)
+    useEffect(() => {
+        setCookbookNameInput(preferences.cookbookName || '');
+        setUserNameInput(preferences.userName || '');
+    }, [preferences.cookbookName, preferences.userName]); // Dependencies for this effect
+
+    // Ref to hold debounce timeouts for each input key
+    const debounceTimeoutRef = useRef({});
+
 
     const themeOptions = [
         { name: 'Light Gray (Default)', type: 'color', value: '#f3f4f6' },
@@ -18,14 +32,26 @@ const SettingsPage = ({ onBack }) => {
         updatePreferences({ theme: theme });
     };
 
+    // Generic debounce function for preference updates
+    const debounceUpdatePreference = (key, value, delay = 500) => { // Delay increased to 500ms
+        if (debounceTimeoutRef.current[key]) {
+            clearTimeout(debounceTimeoutRef.current[key]);
+        }
+        debounceTimeoutRef.current[key] = setTimeout(() => {
+            updatePreferences({ [key]: value });
+        }, delay);
+    };
+
     // Handler for cookbook name change
     const handleCookbookNameChange = (e) => {
-        updatePreferences({ cookbookName: e.target.value });
+        setCookbookNameInput(e.target.value); // Update local input state immediately
+        debounceUpdatePreference('cookbookName', e.target.value); // Debounce update to context/Firestore
     };
 
     // Handler for user name change
     const handleUserNameChange = (e) => {
-        updatePreferences({ userName: e.target.value });
+        setUserNameInput(e.target.value); // Update local input state immediately
+        debounceUpdatePreference('userName', e.target.value); // Debounce update to context/Firestore
     };
 
     const currentThemeValue = preferences.theme ? preferences.theme.value : '#f3f4f6';
@@ -53,8 +79,9 @@ const SettingsPage = ({ onBack }) => {
                 <input
                     type="text"
                     id="cookbookName"
-                    value={preferences.cookbookName || ''}
+                    value={cookbookNameInput} // USING LOCAL STATE
                     onChange={handleCookbookNameChange}
+                    autocomplete="off" // FIX FOR AUTOCOMPLETE WARNING
                     className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150"
                     placeholder="e.g., Grandma's Secret Recipes"
                 />
@@ -71,10 +98,11 @@ const SettingsPage = ({ onBack }) => {
                 <input
                     type="text"
                     id="userName"
-                    value={preferences.userName || ''}
+                    value={userNameInput} // USING LOCAL STATE
                     onChange={handleUserNameChange}
+                    autocomplete="off" // FIX FOR AUTOCOMPLETE WARNING
                     className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"
-                    placeholder="e.g., Matthew, Chef Merz"
+                    placeholder="e.g., Matthew, Chef Hannah, Home Cook"
                 />
             </div>
             {/* --- END NEW SECTION --- */}

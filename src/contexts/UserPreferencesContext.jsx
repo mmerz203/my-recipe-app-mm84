@@ -13,9 +13,9 @@ export const UserPreferencesProvider = ({ children }) => {
     const db = useContext(FirestoreContext);
     const { userId, authReady } = useContext(AuthContext);
     const [preferences, setPreferences] = useState({
-        theme: { type: 'color', value: '#f3f4f6' }, // Keep your existing theme default
+        theme: { type: 'color', value: '#f3f4f6' },
         cookbookName: 'My Family Cookbook',
-        userName: null // <--- THIS LINE MUST BE HERE FOR INITIAL DEFAULT
+        userName: null
     });
     const [loadingPreferences, setLoadingPreferences] = useState(true);
 
@@ -25,20 +25,16 @@ export const UserPreferencesProvider = ({ children }) => {
             return;
         }
 
-        // Corrected: Pass each path segment as a separate argument to doc()
         const userPreferencesRef = doc(db, 'artifacts', appId, 'users', userId, 'preferences', 'userSettings');
 
         const unsubscribe = onSnapshot(userPreferencesRef, (docSnap) => {
             if (docSnap.exists()) {
-                // Merge loaded data with our defaults to ensure new fields are present if not saved yet
-                // This is key for backwards compatibility if a user saved preferences before 'userName' existed
                 setPreferences(prevDefaults => ({ ...prevDefaults, ...docSnap.data() }));
             } else {
-                // If no document exists (new user or no preferences saved), set all defaults
                 setPreferences({
-                    theme: { type: 'color', value: '#f3f4f6' }, // Ensure theme is explicitly set
+                    theme: { type: 'color', value: '#f3f4f6' },
                     cookbookName: 'My Family Cookbook',
-                    userName: null // <--- AND THIS LINE MUST BE HERE FOR DEFAULT IF DOC DOESN'T EXIST
+                    userName: null
                 });
             }
             setLoadingPreferences(false);
@@ -52,15 +48,22 @@ export const UserPreferencesProvider = ({ children }) => {
 
     const updatePreferences = useCallback(async (newPreferences) => {
         if (!db || !userId) return;
+
+        // --- CRUCIAL FIX: Merge new preferences with existing state ---
+        // This ensures all existing properties (like theme, cookbookName) are kept when one is updated.
+        const mergedPreferences = { ...preferences, ...newPreferences };
+
         try {
-            // Corrected: Pass each path segment as a separate argument to doc()
             const userPreferencesRef = doc(db, 'artifacts', appId, 'users', userId, 'preferences', 'userSettings');
-            await setDoc(userPreferencesRef, newPreferences, { merge: true });
-            setPreferences(newPreferences); // Optimistic update
+            await setDoc(userPreferencesRef, mergedPreferences, { merge: true });
+
+            // Optimistically update React state with the full merged object
+            setPreferences(mergedPreferences);
+
         } catch (e) {
             console.error("Error updating preferences: ", e);
         }
-    }, [db, userId]);
+    }, [db, userId, preferences]); // IMPORTANT: 'preferences' MUST be in this dependency array
 
     return (
         <UserPreferencesContext.Provider value={{ preferences, updatePreferences, loadingPreferences }}>
