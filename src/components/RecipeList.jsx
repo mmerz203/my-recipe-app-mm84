@@ -4,6 +4,7 @@ import { RecipeContext } from '../contexts/RecipeContext'; // Import RecipeConte
 import { AuthContext } from '../contexts/AuthContext'; // Import AuthContext
 import LoadingSpinner from './LoadingSpinner'; // Import LoadingSpinner (from same folder)
 import Modal from './Modal'; // Import Modal (from same folder)
+import Button from './Button'; // Import Button component
 
 const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
     const { recipes, loading, error, deleteRecipe } = useContext(RecipeContext);
@@ -56,7 +57,7 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
     if (error) return <div className="text-red-600 text-center p-4 bg-red-100 rounded-lg shadow-md">Error: {error}</div>;
 
     return (
-        <div className="p-8 bg-white rounded-2xl shadow-xl min-h-[80vh] flex flex-col">
+        <div className="p-8 bg-transparent rounded-2xl shadow-xl min-h-[80vh] flex flex-col">
             <Modal
                 show={modal.show}
                 title={modal.title}
@@ -67,21 +68,21 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
             />
 
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-                <button
+                <Button
                     onClick={onBackToHome}
-                    className="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition ease-in-out duration-150 shadow-md font-semibold flex items-center"
+                    className="bg-gray-300 text-gray-800 hover:bg-gray-400 transition ease-in-out duration-150 shadow-md font-semibold flex items-center px-6 py-2 rounded-lg"
                 >
                     <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     Back to Home
-                </button>
+                </Button>
                 <h2 className="text-4xl font-extrabold text-gray-900 text-center tracking-tight flex-grow ml-4">All Recipes</h2>
-                <button
+                <Button
                     onClick={onAddRecipe}
-                    className="px-7 py-3 bg-green-700 text-white rounded-lg hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md font-semibold flex-shrink-0 flex items-center justify-center w-full md:w-auto ml-4"
+                    className="bg-green-700 text-white hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md font-semibold flex-shrink-0 flex items-center justify-center px-7 py-3 rounded-lg"
                 >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                     Add New Recipe
-                </button>
+                </Button>
             </div>
 
             <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
@@ -153,22 +154,22 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
                                 <div className="flex justify-end gap-3 mt-auto">
                                     {recipe.userId && recipe.userId === userId && (
                                         <>
-                                            <button
+                                            <Button
                                                 onClick={() => onSelectRecipe(recipe.id, true)}
-                                                className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md text-sm flex items-center justify-center"
+                                                className="bg-yellow-500 text-white hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md text-sm flex items-center justify-center px-4 py-2 rounded-lg"
                                                 title="Edit Recipe"
                                             >
                                                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L15.232 5.232z"></path></svg>
                                                 Edit
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <Button
                                                 onClick={() => handleDeleteClick(recipe)}
-                                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md text-sm flex items-center justify-center"
+                                                className="bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md text-sm flex items-center justify-center px-4 py-2 rounded-lg"
                                                 title="Delete Recipe"
                                             >
                                                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                 Delete
-                                            </button>
+                                            </Button>
                                         </>
                                     )}
                                 </div>
@@ -181,4 +182,4 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
     );
 };
 
-export default RecipeList; // Add this line
+export default RecipeList;

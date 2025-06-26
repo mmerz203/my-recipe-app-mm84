@@ -1,6 +1,6 @@
 // src/components/OCRInput.jsx
 import React, { useState, useRef } from 'react';
-// parseIngredient is not used directly in this component, so its import is removed.
+import Button from './Button';
 
 const OCRInput = ({ onRecipeParsed }) => {
     const [image, setImage] = useState(null);
@@ -127,9 +127,9 @@ If a field is not found, use an empty string for "name" or "servings", and empty
                         <img src={image} alt="Preview" style={{ maxWidth: '100%', maxHeight: 200 }} />
                     </div>
                 )}
-                <button onClick={extractRecipe} disabled={loading || !image}>
+                <Button onClick={extractRecipe} disabled={loading || !image} className="bg-blue-600 hover:bg-blue-700 focus:ring-blue-400 w-full mt-4">
                     {loading ? 'Extracting...' : 'Extract Recipe'}
-                </button>
+                </Button>
                 {message && <div className="ocr-message">{message}</div>}
             </div>
         );

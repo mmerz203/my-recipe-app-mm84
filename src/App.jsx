@@ -109,23 +109,19 @@ const App = () => {
 
 
     return (
-        <div className="min-h-screen py-8 px-4 font-inter flex flex-col" style={backgroundStyle}>
+        <div className="min-h-full w-full py-8 px-4 font-inter flex flex-col" style={backgroundStyle}>
             {/* --- USER WELCOME / UID DISPLAY (RESTORED STYLING) --- */}
-            {/* This div is placed as a sibling to the main content div */}
-            <div className="bg-blue-100 bg-opacity-90 p-3 rounded-lg shadow-md mb-6 mx-auto max-w-sm text-center border border-blue-200">
-                {/* console.log removed from here */}
+            <div className="bg-blue-100 bg-opacity-80 p-3 rounded-lg shadow-md mb-6 mx-auto max-w-sm text-center border border-blue-200">
                 <p className="text-blue-800 text-base font-semibold">
                     Welcome, {preferences.userName || 'Guest'}!
                 </p>
-                {/* (Commented out UID display) */}
             </div>
             {/* --- END USER WELCOME / UID DISPLAY --- */}
-
 
             <div className="max-w-7xl mx-auto flex-grow">
                 {/* Global Error Display */}
                 {appError && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-6 mx-auto max-w-xl" role="alert">
+                    <div className="bg-red-100 bg-opacity-80 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-6 mx-auto max-w-xl" role="alert">
                         <strong className="font-bold">Error:</strong>
                         <span className="block sm:inline ml-2">{appError}</span>
                         <span className="absolute top-0 bottom-0 right-0 px-4 py-3">

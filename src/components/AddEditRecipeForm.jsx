@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Modal from './Modal'; // Import Modal component from the same 'components' folder
 import OCRInput from './OCRInput'; // Import OCRInput component from the same 'components' folder
+import Button from './Button';
 
 const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel }) => {
     const [recipe, setRecipe] = useState(initialRecipe || {
@@ -123,7 +124,7 @@ const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel }) => {
     const categories = ['Appetizer', 'Main Course', 'Side Dish', 'Dessert', 'Breakfast', 'Soup', 'Salad', 'Drink', 'Baking', 'Other'];
 
     return (
-        <div className="p-8 bg-white rounded-2xl shadow-xl mb-6 border border-gray-200">
+        <div className="p-8 bg-transparent rounded-2xl shadow-xl max-w-3xl mx-auto border border-gray-200">
             <Modal
                 show={modal.show}
                 title={modal.title}
@@ -244,19 +245,19 @@ In a large bowl, whisk together flour and sugar."
                 </div>
 
                 <div className="flex justify-end space-x-4 mt-8">
-                    <button
+                    <Button
                         type="button"
                         onClick={onCancel}
-                        className="px-7 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md font-semibold"
+                        className="bg-gray-300 text-gray-800 hover:bg-gray-400 focus:ring-gray-300 mr-2"
                     >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
-                        className="px-7 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md font-semibold"
+                        className="bg-green-600 hover:bg-green-700 focus:ring-green-500"
                     >
                         Save Recipe
-                    </button>
+                    </Button>
                 </div>
             </form>
         </div>

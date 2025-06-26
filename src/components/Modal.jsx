@@ -1,5 +1,6 @@
 // src/components/Modal.jsx
 import React from 'react';
+import Button from './Button';
 
 const Modal = ({ show, title, message, onClose, onConfirm, showConfirm = false }) => {
     if (!show) return null;
@@ -10,23 +11,23 @@ const Modal = ({ show, title, message, onClose, onConfirm, showConfirm = false }
                 <p className="text-gray-700 mb-6 leading-relaxed">{message}</p>
                 <div className="flex justify-end space-x-3">
                     {showConfirm && (
-                        <button
+                        <Button
                             onClick={onConfirm}
-                            className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md font-semibold"
+                            className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
                         >
                             Confirm
-                        </button>
+                        </Button>
                     )}
-                    <button
+                    <Button
                         onClick={onClose}
-                        className="px-5 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md font-semibold"
+                        className="bg-gray-300 text-gray-800 hover:bg-gray-400 focus:ring-gray-300"
                     >
                         Close
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
     );
 };
 
-export default Modal; // Add this line
+export default Modal;

@@ -36,45 +36,9 @@ footer {
     padding-bottom: 20px; /* Space below footer content */
     color: #6b7280; /* Text color */
     font-size: 0.9em; /* Font size */
-    background-color: #f0f0f0; /* Light background for the footer itself */
+    background-color: transparent !important; /* Make footer background transparent */
     flex-shrink: 0; /* Prevent footer from shrinking if content is too large */
-}
-
-/* Custom Shadow Classes (copied from original giant block) */
-.shadow-md {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-.shadow-lg {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-.shadow-xl {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-.shadow-inner {
-    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-}
-
-/* Custom Border-Radius Classes (copied from original giant block) */
-.rounded-xl {
-    border-radius: 0.75rem;
-}
-.rounded-2xl {
-    border-radius: 1rem;
-}
-
-/* Custom Transition and Transform Classes (copied from original giant block) */
-.transition, .transition-all {
-    transition-property: all;
-    transition-duration: 150ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-.transform {
-    transform: var(--tw-transform);
-}
-.scale-102:hover {
-    --tw-scale-x: 1.02;
-    --tw-scale-y: 1.02;
-    transform: var(--tw-transform);
+    /* Optionally, add backdrop-blur or bg-opacity if you want a subtle effect */
 }
 
 /* Explicitly ensure no animations on home component elements (important for consistency) */
@@ -99,22 +63,6 @@ footer {
 
 /* General Responsive Adjustments (from original giant block) */
 @media (max-width: 640px) {
-    .flex-col.sm\:flex-row {
-        flex-direction: column !important;
-    }
-    .space-y-4.sm\:space-y-0 {
-        --tw-space-y-reverse: 0;
-        margin-top: calc(1rem * var(--tw-space-y-reverse)) !important;
-        margin-bottom: calc(1rem * (1 - var(--tw-space-y-reverse))) !important;
-    }
-    .sm\:space-x-6 {
-        --tw-space-x-reverse: 0;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-    }
-    .sm\:w-auto {
-        width: 100% !important;
-    }
     .HomeComponent button {
         width: 100%;
     }

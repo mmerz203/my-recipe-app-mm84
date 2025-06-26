@@ -1,6 +1,7 @@
 // src/components/SettingsPage.jsx
 import React, { useContext, useState, useEffect, useRef } from 'react'; // <--- CRITICAL: useState, useEffect, useRef MUST BE IMPORTED HERE
 import { UserPreferencesContext } from '../contexts/UserPreferencesContext';
+import Button from './Button';
 
 const SettingsPage = ({ onBack }) => {
     const { preferences, updatePreferences } = useContext(UserPreferencesContext);
@@ -57,15 +58,15 @@ const SettingsPage = ({ onBack }) => {
     const currentThemeValue = preferences.theme ? preferences.theme.value : '#f3f4f6';
 
     return (
-        <div className="p-8 bg-white rounded-2xl shadow-xl mb-6 max-w-4xl mx-auto border border-gray-200">
+        <div className="p-8 rounded-2xl shadow-xl mb-6 max-w-4xl mx-auto border border-gray-200 bg-transparent">
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-                <button
+                <Button
                     onClick={onBack}
-                    className="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition ease-in-out duration-150 shadow-md font-semibold flex items-center"
+                    className="bg-gray-300 text-gray-800 hover:bg-gray-400 focus:ring-gray-300 flex items-center"
                 >
                     <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     Back to Home
-                </button>
+                </Button>
                 <h2 className="text-4xl font-extrabold text-gray-900 text-center tracking-tight flex-grow ml-4">Settings</h2>
             </div>
 
@@ -93,15 +94,15 @@ const SettingsPage = ({ onBack }) => {
                 <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 Your Display Name
             </h3>
-            <div className="mb-8">
+            <div className="mb-8 bg-transparent">
                 <label htmlFor="userName" className="block text-gray-700 text-base font-bold mb-2">How should we call you?</label>
                 <input
                     type="text"
                     id="userName"
                     value={userNameInput} // USING LOCAL STATE
                     onChange={handleUserNameChange}
-                    autocomplete="off" // FIX FOR AUTOCOMPLETE WARNING
-                    className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+                    autoComplete="off"
+                    className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 bg-transparent"
                     placeholder="e.g., Matthew, Chef Hannah, Home Cook"
                 />
             </div>
@@ -121,19 +122,13 @@ const SettingsPage = ({ onBack }) => {
                         onClick={() => handleThemeChange(theme)}
                     >
                         <div
-                            className={`w-full h-24 rounded-md flex items-center justify-center text-xs font-semibold text-gray-900 overflow-hidden
-                                        ${theme.type === 'color' ? `bg-[${theme.value}]` : ''} ${theme.className || ''}`}
+                            className={`w-full h-24 rounded-md flex items-center justify-center text-xs font-semibold text-gray-900 overflow-hidden`
+                                + (theme.type === 'color' ? ` bg-[${theme.value}]` : '') + (theme.className ? ` ${theme.className}` : '')}
                             style={theme.type !== 'color' ? { backgroundImage: `url(${theme.value})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { backgroundColor: theme.value }}
                         >
-                            {theme.name.includes('(Texture)') || theme.name.includes('(Gradient)') ? (
-                                <span className="text-white text-shadow-sm p-1 rounded bg-black bg-opacity-30">
-                                    {theme.name.replace(' (Texture)', '').replace(' (Gradient)', '')}
-                                </span>
-                            ) : (
-                                theme.name
-                            )}
+                            {/* Only show a short label or icon if needed, or leave empty for color swatches */}
                         </div>
-                        <p className="text-center mt-2 text-sm text-gray-700">{theme.name}</p>
+                        <p className="text-center mt-2 text-sm text-gray-700 truncate overflow-hidden" title={theme.name}>{theme.name.replace(' (Texture)', '').replace(' (Gradient)', '')}</p>
                     </div>
                 ))}
             </div>
