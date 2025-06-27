@@ -20,18 +20,56 @@ const SettingsPage = ({ onBack }) => {
     const debounceTimeoutRef = useRef({});
 
 
+    // Example: Add more palettes by duplicating the object and changing the name/colors
     const themeOptions = [
-        { name: 'Light Gray (Default)', type: 'color', value: '#f3f4f6' },
-        { name: 'Warm Beige', type: 'color', value: '#F5F5DC' },
-        { name: 'Soft Green', type: 'color', value: '#E8F5E9' },
-        { name: 'Cozy Wood (Texture)', type: 'image', value: 'https://placehold.co/1920x1080/D2B48C/5C4033?text=Wood+Texture', className: 'bg-cover bg-center' },
-        { name: 'Abstract Blue (Gradient)', type: 'gradient', value: 'linear-gradient(to bottom right, #ADD8E6, #87CEEB)' },
-        { name: 'Warm Autumn Palette', type: 'color', value: '#f2af29' }, // Your custom theme option
+        {
+            name: 'Teal Sunset',
+            type: 'roles',
+            value: [
+                { role: 'Primary Accent', name: 'Warm Orange', hex: '#f2af29' },
+                { role: 'Primary Text', name: 'Black', hex: '#000000' },
+                { role: 'Danger', name: 'Red', hex: '#d36060' },
+                { role: 'Secondary Accent', name: 'Teal', hex: '#388697' },
+                { role: 'Background', name: 'Light Gray', hex: '#e0e0ce' },
+            ]
+        },
+        {
+            name: 'Fresh Ocean Palette',
+            type: 'roles',
+            value: [
+                { role: 'Primary Accent', name: 'Fresh Blue', hex: '#5c9ead' },         // primary-fresh
+                { role: 'Primary Text', name: 'Dark Ocean', hex: '#326273' },           // text-dark-fresh
+                { role: 'Secondary Accent', name: 'Warm Sand', hex: '#e39774' },        // secondary-warm
+                { role: 'Neutral Subtle', name: 'Subtle Gray', hex: '#eeeeee' },        // neutral-subtle
+                { role: 'Background', name: 'Fresh White', hex: '#ffffff' },            // background-light-fresh
+            ]
+        },
+        {
+            name: 'Soothing Sage Palette',
+            type: 'roles',
+            value: [
+                { role: 'Primary Accent', name: 'Sage Green', hex: '#708b75' },         // primary-sage
+                { role: 'Primary Text', name: 'Deep Sage', hex: '#3d315b' },            // text-sage-dark
+                { role: 'Secondary Accent', name: 'Indigo Sage', hex: '#444b6e' },      // secondary-sage
+                { role: 'Neutral Sage', name: 'Soft Sage', hex: '#9ab87a' },            // neutral-sage
+                { role: 'Background', name: 'Sage Light', hex: '#f8f991' },             // background-sage-light
+            ]
+        },
+        // Future palettes can be added here:
+        // {
+        //     name: 'Sunset Dream',
+        //     type: 'roles',
+        //     value: [ ...5 colors... ]
+        // },
     ];
 
-    const handleThemeChange = (theme) => {
-        updatePreferences({ theme: theme });
+    // Handler to apply a palette (all 5 roles/colors)
+    const handlePaletteSelect = (palette) => {
+        updatePreferences({ theme: { name: palette.name, type: 'roles', value: palette.value } });
     };
+
+    // Determine which palette is currently active
+    const currentTheme = preferences.theme && preferences.theme.type === 'roles' ? preferences.theme : null;
 
     // Generic debounce function for preference updates
     const debounceUpdatePreference = (key, value, delay = 500) => { // Delay increased to 500ms
@@ -57,17 +95,22 @@ const SettingsPage = ({ onBack }) => {
 
     const currentThemeValue = preferences.theme ? preferences.theme.value : '#f3f4f6';
 
+    // Render palette colors as individual swatches for selection
+    const handlePaletteColorChange = (color) => {
+        updatePreferences({ theme: { name: 'Brand Palette', type: 'color', value: color.hex } });
+    };
+
     return (
-        <div className="p-8 rounded-2xl shadow-xl mb-6 max-w-4xl mx-auto border border-gray-200 bg-transparent">
+        <div className="p-8 rounded-2xl shadow-xl mb-6 max-w-4xl mx-auto border border-gray-200 bg-background-light">
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
                 <Button
                     onClick={onBack}
-                    className="bg-gray-300 text-gray-800 hover:bg-gray-400 focus:ring-gray-300 flex items-center"
+                    className="bg-primary-brand text-text-dark hover:bg-secondary-brand focus:ring-primary-brand flex items-center"
                 >
                     <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     Back to Home
                 </Button>
-                <h2 className="text-4xl font-extrabold text-gray-900 text-center tracking-tight flex-grow ml-4">Settings</h2>
+                <h2 className="text-4xl font-extrabold text-text-dark text-center tracking-tight flex-grow ml-4">Settings</h2>
             </div>
 
             {/* --- SECTION FOR COOKBOOK NAME INPUT --- */}
@@ -112,23 +155,25 @@ const SettingsPage = ({ onBack }) => {
                 <svg className="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 Background Themes
             </h3>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {themeOptions.map((theme, index) => (
-                    <div
-                        key={index}
-                        className={`relative p-2 border-2 rounded-lg cursor-pointer transition transform hover:scale-105 duration-150
-                                    ${currentThemeValue === theme.value ? 'border-green-500 shadow-md' : 'border-gray-200'}`}
-                        onClick={() => handleThemeChange(theme)}
-                    >
-                        <div
-                            className={`w-full h-24 rounded-md flex items-center justify-center text-xs font-semibold text-gray-900 overflow-hidden`
-                                + (theme.type === 'color' ? ` bg-[${theme.value}]` : '') + (theme.className ? ` ${theme.className}` : '')}
-                            style={theme.type !== 'color' ? { backgroundImage: `url(${theme.value})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { backgroundColor: theme.value }}
+            <div className="flex flex-col gap-8 mb-8">
+                {themeOptions.map((palette, pIdx) => (
+                    <div key={palette.name} className="flex flex-col items-start gap-2">
+                        {/* Preview Button with theme name, now functional */}
+                        <Button
+                            style={{
+                                background: palette.value[0].hex, // Primary Accent
+                                color: palette.value[1].hex,      // Primary Text
+                                border: `2px solid ${palette.value[3].hex}` // Secondary Accent as border
+                            }}
+                            className={`font-semibold rounded shadow px-6 py-3 text-lg mb-2 ${currentTheme && currentTheme.name === palette.name ? 'ring-2 ring-green-500 scale-105' : ''}`}
+                            onClick={() => handlePaletteSelect(palette)}
                         >
-                            {/* Only show a short label or icon if needed, or leave empty for color swatches */}
-                        </div>
-                        <p className="text-center mt-2 text-sm text-gray-700 truncate overflow-hidden" title={theme.name}>{theme.name.replace(' (Texture)', '').replace(' (Gradient)', '')}</p>
+                            {palette.name}
+                        </Button>
+                        {/* Only show 'Selected' if this palette is active */}
+                        {currentTheme && currentTheme.name === palette.name && false && (
+                            <span className="text-green-600 font-bold ml-1 mt-1">Selected</span>
+                        )}
                     </div>
                 ))}
             </div>

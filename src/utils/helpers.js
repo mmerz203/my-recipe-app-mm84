@@ -68,7 +68,7 @@ export const formatFraction = (num) => {
     bestNumerator /= commonDivisor;
     bestDenominator /= commonDivisor;
 
-    let formattedFraction = `<span class="math-inline">\{bestNumerator\}/</span>{bestDenominator}`;
+    let formattedFraction = `${bestNumerator}/${bestDenominator}`;
 
     if (wholePart > 0) {
         formattedFraction = `${wholePart} ${formattedFraction}`;

@@ -101,6 +101,7 @@ If a field is not found, use an empty string for "name" or "servings", and empty
                 if (fileInputRef.current) {
                     fileInputRef.current.value = ''; // Clear file input
                 }
+                setMessage(''); // Instantly remove the OCR prompt/message
             } else {
                 setMessage('Could not extract recipe. Please try again.');
                 console.error("Gemini API response structure unexpected:", result);

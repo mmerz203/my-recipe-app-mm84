@@ -10,6 +10,7 @@ import RecipeList from './components/RecipeList';
 import AddEditRecipeForm from './components/AddEditRecipeForm';
 import RecipeDetail from './components/RecipeDetail';
 import SettingsPage from './components/SettingsPage';
+import Footer from './components/Footer';
 
 
 const App = () => {
@@ -92,6 +93,7 @@ const App = () => {
     const currentRecipe = selectedRecipeId ? recipes.find(r => r.id === selectedRecipeId) : null;
 
     const backgroundStyle = {};
+    // --- THEME PALETTE SUPPORT ---
     if (preferences.theme) {
         if (preferences.theme.type === 'color') {
             backgroundStyle.backgroundColor = preferences.theme.value;
@@ -102,6 +104,14 @@ const App = () => {
             backgroundStyle.backgroundAttachment = 'fixed';
         } else if (preferences.theme.type === 'gradient') {
             backgroundStyle.backgroundImage = preferences.theme.value;
+        } else if (preferences.theme.type === 'roles' && Array.isArray(preferences.theme.value)) {
+            // Find the background color from the palette roles
+            const bgRole = preferences.theme.value.find(c => c.role.toLowerCase().includes('background'));
+            if (bgRole) {
+                backgroundStyle.backgroundColor = bgRole.hex;
+            } else {
+                backgroundStyle.backgroundColor = '#f3f4f6';
+            }
         }
     } else {
         backgroundStyle.backgroundColor = '#f3f4f6';
@@ -157,6 +167,7 @@ const App = () => {
                     <SettingsPage onBack={() => setView('home')} />
                 )}
             </div>
+            <Footer />
         </div>
     );
 };

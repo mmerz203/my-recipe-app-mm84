@@ -20,6 +20,27 @@ const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel }) => {
     const [imagePreview, setImagePreview] = useState(initialRecipe?.imageUrl || '');
     const [modal, setModal] = useState({ show: false, title: '', message: '', onConfirm: null, showConfirm: false });
 
+    // --- Baking/Cooking Mode State ---
+    const [isBakingRecipe, setIsBakingRecipe] = useState(false);
+
+    // Heuristic detection for baking (run on name/ingredients change)
+    useEffect(() => {
+        const strongTitle = /cake|bread|cookie|pie|muffin|scone|brownie|pastry|tart/i;
+        const strongIngr = /baking powder|baking soda|yeast/i;
+        const secondaryIngr = /flour|granulated sugar|brown sugar|confectioners'? sugar/i;
+        const weightUnits = /gram|g|ounce|oz/i;
+        const cookingTitle = /soup|stew|curry|casserole|stir-fry|roast|grill/i;
+        const cookingIngr = /meat|broth|stock|vegetable/i;
+        let score = 0;
+        if (strongTitle.test(recipe.name)) score += 3;
+        if (recipe.ingredients.some(ing => strongIngr.test(ing))) score += 3;
+        if (recipe.ingredients.some(ing => secondaryIngr.test(ing))) score += 1;
+        if (recipe.ingredients.filter(ing => weightUnits.test(ing)).length > 1) score += 1;
+        if (cookingTitle.test(recipe.name)) score -= 2;
+        if (recipe.ingredients.some(ing => cookingIngr.test(ing))) score -= 1;
+        setIsBakingRecipe(score >= 3);
+    }, [recipe.name, recipe.ingredients]);
+
     // Update state when initialRecipe changes (for editing)
     useEffect(() => {
         if (initialRecipe) {
@@ -116,7 +137,8 @@ const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel }) => {
             servings: parseFloat(recipe.servings) || 1, // Ensure servings is a number
             imageUrl: finalImageUrl,
             ingredients: ingredientInput.split('\n').filter(line => line.trim() !== ''),
-            instructions: instructionInput.split('\n').filter(line => line.trim() !== '')
+            instructions: instructionInput.split('\n').filter(line => line.trim() !== ''),
+            isBakingRecipe,
         };
         onSave(recipeToSave);
     };
@@ -135,6 +157,7 @@ const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel }) => {
             />
             <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">{initialRecipe ? 'Edit Recipe' : 'Add New Recipe'} (Recipe Input)</h2>
 
+            {/* Remove double-layered text by not rendering OCRInput's message as a separate block here */}
             <OCRInput onRecipeParsed={handleRecipeParsedFromOCR} />
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -180,6 +203,20 @@ const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel }) => {
                     />
                 </div>
 
+                {/* --- Baking/Cooking Toggle --- */}
+                <div className="flex items-center mt-2 mb-4">
+                    <input
+                        type="checkbox"
+                        id="isBakingRecipe"
+                        checked={isBakingRecipe}
+                        onChange={e => setIsBakingRecipe(e.target.checked)}
+                        className="form-checkbox h-5 w-5 text-green-600 rounded-md border-gray-300 focus:ring-green-500"
+                    />
+                    <label htmlFor="isBakingRecipe" className="ml-3 text-gray-700 text-base font-bold">
+                        Treat as Baking Recipe (Exact Measurements)
+                    </label>
+                </div>
+
                 <div>
                     <label htmlFor="ingredients" className="block text-gray-700 text-base font-bold mb-2">Ingredients (one per line):</label>
                     <textarea
@@ -189,11 +226,8 @@ const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel }) => {
                         onChange={handleIngredientInput}
                         rows="8"
                         required
-                        className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150"
-                        placeholder="e.g.,
-1 cup all-purpose flour
-2 large eggs
-1/2 teaspoon salt"
+                        className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150 resize-y overflow-auto min-h-[8rem] max-h-60"
+                        placeholder="e.g.,\n1 cup all-purpose flour\n2 large eggs\n1/2 teaspoon salt"
                     ></textarea>
                 </div>
 
@@ -206,10 +240,8 @@ const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel }) => {
                         onChange={handleInstructionInput}
                         rows="8"
                         required
-                        className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150"
-                        placeholder="e.g.,
-Preheat oven to 375°F (190°C).
-In a large bowl, whisk together flour and sugar."
+                        className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150 resize-y overflow-auto min-h-[8rem] max-h-60"
+                        placeholder="e.g.,\nPreheat oven to 375°F (190°C).\nIn a large bowl, whisk together flour and sugar."
                     ></textarea>
                 </div>
 

@@ -105,7 +105,11 @@ const RecipeDetail = ({ recipe, onBack, onEdit }) => {
                 </div>
             )}
 
-            <ServingSizeConverter ingredients={recipe.ingredients} originalServings={parseFloat(recipe.servings)} />
+            <ServingSizeConverter 
+                ingredients={recipe.ingredients} 
+                originalServings={parseFloat(recipe.servings)} 
+                isBakingRecipe={recipe.isBakingRecipe !== undefined ? recipe.isBakingRecipe : true}
+            />
 
             <div className="mb-6 bg-gray-50 p-5 rounded-lg shadow-inner">
                 <h3 className="text-xl font-bold text-gray-800 mb-3">Ingredients:</h3>

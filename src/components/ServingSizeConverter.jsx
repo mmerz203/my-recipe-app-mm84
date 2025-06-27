@@ -2,9 +2,30 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { parseFraction, formatFraction, parseIngredient } from '../utils/helpers'; // Import helpers functions
 
-const ServingSizeConverter = ({ ingredients, originalServings }) => {
+const ServingSizeConverter = ({ ingredients, originalServings, isBakingRecipe = true }) => {
     const [currentServings, setCurrentServings] = useState(originalServings || 1);
     const [convertedIngredients, setConvertedIngredients] = useState([]);
+
+    // Helper: Round to nearest practical fraction (1/4, 1/2, whole)
+    const roundToPractical = (num) => {
+        if (num == null || isNaN(num)) return '';
+        const whole = Math.floor(num);
+        const frac = num - whole;
+        // Nearest 0, 1/4, 1/2, 3/4, 1
+        const steps = [0, 0.25, 0.5, 0.75, 1];
+        let best = steps[0];
+        let minDiff = Math.abs(frac - steps[0]);
+        for (let s of steps) {
+            const diff = Math.abs(frac - s);
+            if (diff < minDiff) {
+                minDiff = diff;
+                best = s;
+            }
+        }
+        const rounded = whole + best;
+        // Remove trailing .00
+        return rounded % 1 === 0 ? String(Math.round(rounded)) : formatFraction(rounded);
+    };
 
     // --- MOVED: Function to convert ingredients based on new serving size ---
     // Defined BEFORE useEffect to prevent "Cannot access before initialization" error
@@ -14,18 +35,21 @@ const ServingSizeConverter = ({ ingredients, originalServings }) => {
             setConvertedIngredients(ingredients ? ingredients.map(ing => parseIngredient(ing)) : []);
             return;
         }
-
         const conversionFactor = newServings / safeInitialServings;
-
         const newConverted = ingredients.map(line => {
             const parsed = parseIngredient(line);
             if (!parsed || !parsed.quantity) return parsed;
-
             try {
                 const numericalQuantity = parseFraction(parsed.quantity);
-                const newNumericalQuantity = numericalQuantity * conversionFactor;
-                const newFormattedQuantity = formatFraction(newNumericalQuantity);
-
+                let newNumericalQuantity = numericalQuantity * conversionFactor;
+                let newFormattedQuantity;
+                if (isBakingRecipe) {
+                    // Baking: exact (fractional)
+                    newFormattedQuantity = formatFraction(newNumericalQuantity);
+                } else {
+                    // Cooking: round to practical
+                    newFormattedQuantity = roundToPractical(newNumericalQuantity);
+                }
                 return {
                     ...parsed,
                     quantity: newFormattedQuantity,
@@ -37,7 +61,7 @@ const ServingSizeConverter = ({ ingredients, originalServings }) => {
             }
         });
         setConvertedIngredients(newConverted);
-    }, [ingredients, parseFraction, formatFraction, parseIngredient]); // Dependencies for useCallback
+    }, [ingredients, parseFraction, formatFraction, parseIngredient, isBakingRecipe]); // Dependencies for useCallback
 
 
     // --- useEffect (now calls convertIngredients after its definition) ---
