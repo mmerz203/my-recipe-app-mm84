@@ -1,184 +1,662 @@
-// src/components/SettingsPage.jsx
-import React, { useContext, useState, useEffect, useRef } from 'react'; // <--- CRITICAL: useState, useEffect, useRef MUST BE IMPORTED HERE
-import { UserPreferencesContext } from '../contexts/UserPreferencesContext';
-import Button from './Button';
+// Exact Winsome Designs Settings Page - Complete Implementation
+import React, { useState, useContext, useEffect, useRef } from "react";
+import { UserPreferencesContext } from "../contexts/UserPreferencesContext";
+
+// Exact font family from specifications
+const fontFamily =
+  'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
+
+// Back Arrow Icon
+const BackIcon = ({ size = 18 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="rgb(16, 8, 43)"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M19 12H5M12 19l-7-7 7-7" />
+  </svg>
+);
+
+// Settings Icon
+const SettingsIcon = ({ size = 20 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="white"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="12" r="3" />
+    <path d="M12 1v6m0 6v6m6-9h-6m-6 0h6" />
+    <path d="m21 12-4.35-4.35M3 12l4.35-4.35m0 8.7L3 12m14.65 4.35L21 12" />
+  </svg>
+);
 
 const SettingsPage = ({ onBack }) => {
-    const { preferences, updatePreferences } = useContext(UserPreferencesContext);
+  const { preferences, updatePreferences } = useContext(UserPreferencesContext);
+  const [cookbookName, setCookbookName] = useState(
+    preferences.cookbookName || "Winsome Designs",
+  );
+  const [displayName, setDisplayName] = useState(
+    preferences.userName || "Chef",
+  );
+  const [selectedTheme, setSelectedTheme] = useState("winsome");
 
-    // Local state for input fields to ensure smooth typing
-    const [cookbookNameInput, setCookbookNameInput] = useState(preferences.cookbookName || '');
-    const [userNameInput, setUserNameInput] = useState(preferences.userName || '');
+  // Debounce timeout ref
+  const debounceTimeoutRef = useRef({});
 
-    // Sync local state with preferences from context when preferences change (e.g., loaded from Firestore)
-    useEffect(() => {
-        setCookbookNameInput(preferences.cookbookName || '');
-        setUserNameInput(preferences.userName || '');
-    }, [preferences.cookbookName, preferences.userName]); // Dependencies for this effect
+  // Sync with preferences
+  useEffect(() => {
+    setCookbookName(preferences.cookbookName || "Winsome Designs");
+    setDisplayName(preferences.userName || "Chef");
+  }, [preferences.cookbookName, preferences.userName]);
 
-    // Ref to hold debounce timeouts for each input key
-    const debounceTimeoutRef = useRef({});
+  // Debounce function
+  const debounceUpdate = (key, value, delay = 500) => {
+    if (debounceTimeoutRef.current[key]) {
+      clearTimeout(debounceTimeoutRef.current[key]);
+    }
+    debounceTimeoutRef.current[key] = setTimeout(() => {
+      updatePreferences({ [key]: value });
+    }, delay);
+  };
 
+  const handleCookbookNameChange = (e) => {
+    setCookbookName(e.target.value);
+    debounceUpdate("cookbookName", e.target.value);
+  };
 
-    // Example: Add more palettes by duplicating the object and changing the name/colors
-    const themeOptions = [
-        {
-            name: 'Teal Sunset',
-            type: 'roles',
-            value: [
-                { role: 'Primary Accent', name: 'Warm Orange', hex: '#f2af29' },
-                { role: 'Primary Text', name: 'Black', hex: '#000000' },
-                { role: 'Danger', name: 'Red', hex: '#d36060' },
-                { role: 'Secondary Accent', name: 'Teal', hex: '#388697' },
-                { role: 'Background', name: 'Light Gray', hex: '#e0e0ce' },
-            ]
-        },
-        {
-            name: 'Fresh Ocean Palette',
-            type: 'roles',
-            value: [
-                { role: 'Primary Accent', name: 'Fresh Blue', hex: '#5c9ead' },         // primary-fresh
-                { role: 'Primary Text', name: 'Dark Ocean', hex: '#326273' },           // text-dark-fresh
-                { role: 'Secondary Accent', name: 'Warm Sand', hex: '#e39774' },        // secondary-warm
-                { role: 'Neutral Subtle', name: 'Subtle Gray', hex: '#eeeeee' },        // neutral-subtle
-                { role: 'Background', name: 'Fresh White', hex: '#ffffff' },            // background-light-fresh
-            ]
-        },
-        {
-            name: 'Soothing Sage Palette',
-            type: 'roles',
-            value: [
-                { role: 'Primary Accent', name: 'Sage Green', hex: '#708b75' },         // primary-sage
-                { role: 'Primary Text', name: 'Deep Sage', hex: '#3d315b' },            // text-sage-dark
-                { role: 'Secondary Accent', name: 'Indigo Sage', hex: '#444b6e' },      // secondary-sage
-                { role: 'Neutral Sage', name: 'Soft Sage', hex: '#9ab87a' },            // neutral-sage
-                { role: 'Background', name: 'Sage Light', hex: '#f8f991' },             // background-sage-light
-            ]
-        },
-        // Future palettes can be added here:
-        // {
-        //     name: 'Sunset Dream',
-        //     type: 'roles',
-        //     value: [ ...5 colors... ]
-        // },
-    ];
+  const handleDisplayNameChange = (e) => {
+    setDisplayName(e.target.value);
+    debounceUpdate("userName", e.target.value);
+  };
 
-    // Handler to apply a palette (all 5 roles/colors)
-    const handlePaletteSelect = (palette) => {
-        updatePreferences({ theme: { name: palette.name, type: 'roles', value: palette.value } });
-    };
+  const handleSaveChanges = () => {
+    updatePreferences({
+      cookbookName: cookbookName,
+      userName: displayName,
+    });
+  };
 
-    // Determine which palette is currently active
-    const currentTheme = preferences.theme && preferences.theme.type === 'roles' ? preferences.theme : null;
+  const themes = [
+    {
+      id: "winsome",
+      name: "Winsome",
+      colors: ["rgb(252, 161, 126)", "rgb(218, 98, 125)", "rgb(154, 52, 142)"],
+      gradient:
+        "linear-gradient(135deg, rgb(246, 220, 198) 0%, rgba(252, 161, 126, 0.2) 50%, rgba(218, 98, 125, 0.2) 100%)",
+      selected: true,
+    },
+    {
+      id: "classic",
+      name: "Classic",
+      colors: ["rgb(107, 114, 128)", "rgb(75, 85, 99)", "rgb(55, 65, 81)"],
+      gradient:
+        "linear-gradient(135deg, rgb(249, 250, 251) 0%, rgba(107, 114, 128, 0.2) 50%, rgba(75, 85, 99, 0.2) 100%)",
+      selected: false,
+    },
+    {
+      id: "nature",
+      name: "Nature",
+      colors: ["rgb(34, 197, 94)", "rgb(22, 163, 74)", "rgb(21, 128, 61)"],
+      gradient:
+        "linear-gradient(135deg, rgb(240, 253, 244) 0%, rgba(34, 197, 94, 0.2) 50%, rgba(22, 163, 74, 0.2) 100%)",
+      selected: false,
+    },
+    {
+      id: "royal",
+      name: "Royal",
+      colors: ["rgb(99, 102, 241)", "rgb(79, 70, 229)", "rgb(67, 56, 202)"],
+      gradient:
+        "linear-gradient(135deg, rgb(238, 242, 255) 0%, rgba(99, 102, 241, 0.2) 50%, rgba(79, 70, 229, 0.2) 100%)",
+      selected: false,
+    },
+  ];
 
-    // Generic debounce function for preference updates
-    const debounceUpdatePreference = (key, value, delay = 500) => { // Delay increased to 500ms
-        if (debounceTimeoutRef.current[key]) {
-            clearTimeout(debounceTimeoutRef.current[key]);
-        }
-        debounceTimeoutRef.current[key] = setTimeout(() => {
-            updatePreferences({ [key]: value });
-        }, delay);
-    };
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "rgb(246, 220, 198)",
+        fontFamily: fontFamily,
+        fontSize: "16px",
+        fontWeight: "400",
+        lineHeight: "24px",
+        color: "rgb(16, 8, 43)",
+      }}
+    >
+      {/* Header */}
+      <header
+        style={{
+          background: "rgb(246, 220, 198)",
+          borderBottom: "1px solid rgba(230, 202, 179, 0.2)",
+          padding: "24px 16px",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1024px",
+            margin: "auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          {/* Left Side */}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <button
+              onClick={onBack}
+              style={{
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                padding: "8px",
+                borderRadius: "6px",
+                transition: "background-color 0.2s ease",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onMouseEnter={(e) =>
+                (e.target.style.backgroundColor = "rgba(252, 161, 126, 0.1)")
+              }
+              onMouseLeave={(e) =>
+                (e.target.style.backgroundColor = "transparent")
+              }
+            >
+              <BackIcon size={18} />
+            </button>
 
-    // Handler for cookbook name change
-    const handleCookbookNameChange = (e) => {
-        setCookbookNameInput(e.target.value); // Update local input state immediately
-        debounceUpdatePreference('cookbookName', e.target.value); // Debounce update to context/Firestore
-    };
-
-    // Handler for user name change
-    const handleUserNameChange = (e) => {
-        setUserNameInput(e.target.value); // Update local input state immediately
-        debounceUpdatePreference('userName', e.target.value); // Debounce update to context/Firestore
-    };
-
-    const currentThemeValue = preferences.theme ? preferences.theme.value : '#f3f4f6';
-
-    // Render palette colors as individual swatches for selection
-    const handlePaletteColorChange = (color) => {
-        updatePreferences({ theme: { name: 'Brand Palette', type: 'color', value: color.hex } });
-    };
-
-    return (
-        <div className="p-8 rounded-2xl shadow-xl mb-6 max-w-4xl mx-auto border border-gray-200 bg-background-light">
-            <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-                <Button
-                    onClick={onBack}
-                    className="bg-primary-brand text-text-dark hover:bg-secondary-brand focus:ring-primary-brand flex items-center"
-                >
-                    <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    Back to Home
-                </Button>
-                <h2 className="text-4xl font-extrabold text-text-dark text-center tracking-tight flex-grow ml-4">Settings</h2>
+            <div
+              style={{
+                width: "32px",
+                height: "32px",
+                background: "rgb(154, 52, 142)",
+                borderRadius: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <SettingsIcon size={20} />
             </div>
 
-            {/* --- SECTION FOR COOKBOOK NAME INPUT --- */}
-            <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <svg className="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 10h.01M15 10h.01M9 14h.01M15 14h.01M9 18h.01M15 18h.01"></path></svg>
-                Cookbook Name
-            </h3>
-            <div className="mb-8">
-                <label htmlFor="cookbookName" className="block text-gray-700 text-base font-bold mb-2">Your Cookbook Title:</label>
-                <input
-                    type="text"
-                    id="cookbookName"
-                    value={cookbookNameInput} // USING LOCAL STATE
-                    onChange={handleCookbookNameChange}
-                    autocomplete="off" // FIX FOR AUTOCOMPLETE WARNING
-                    className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150"
-                    placeholder="e.g., Grandma's Secret Recipes"
-                />
-            </div>
-            {/* --- END SECTION --- */}
+            <h1
+              style={{
+                fontSize: "20px",
+                fontWeight: "700",
+                margin: "0",
+                color: "rgb(16, 8, 43)",
+                fontFamily: fontFamily,
+              }}
+            >
+              Settings
+            </h1>
+          </div>
 
-            {/* --- SECTION FOR USER NAME INPUT --- */}
-            <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                Your Display Name
-            </h3>
-            <div className="mb-8 bg-transparent">
-                <label htmlFor="userName" className="block text-gray-700 text-base font-bold mb-2">How should we call you?</label>
-                <input
-                    type="text"
-                    id="userName"
-                    value={userNameInput} // USING LOCAL STATE
-                    onChange={handleUserNameChange}
-                    autoComplete="off"
-                    className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 bg-transparent"
-                    placeholder="e.g., Matthew, Chef Hannah, Home Cook"
-                />
-            </div>
-            {/* --- END NEW SECTION --- */}
-
-            <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <svg className="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                Background Themes
-            </h3>
-            <div className="flex flex-col gap-8 mb-8">
-                {themeOptions.map((palette, pIdx) => (
-                    <div key={palette.name} className="flex flex-col items-start gap-2">
-                        {/* Preview Button with theme name, now functional */}
-                        <Button
-                            style={{
-                                background: palette.value[0].hex, // Primary Accent
-                                color: palette.value[1].hex,      // Primary Text
-                                border: `2px solid ${palette.value[3].hex}` // Secondary Accent as border
-                            }}
-                            className={`font-semibold rounded shadow px-6 py-3 text-lg mb-2 ${currentTheme && currentTheme.name === palette.name ? 'ring-2 ring-green-500 scale-105' : ''}`}
-                            onClick={() => handlePaletteSelect(palette)}
-                        >
-                            {palette.name}
-                        </Button>
-                        {/* Only show 'Selected' if this palette is active */}
-                        {currentTheme && currentTheme.name === palette.name && false && (
-                            <span className="text-green-600 font-bold ml-1 mt-1">Selected</span>
-                        )}
-                    </div>
-                ))}
-            </div>
+          {/* Right Side */}
+          <button
+            onClick={handleSaveChanges}
+            style={{
+              background: "rgb(154, 52, 142)",
+              color: "white",
+              fontWeight: "600",
+              padding: "8px 16px",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              transition: "background-color 0.2s ease",
+              fontFamily: fontFamily,
+            }}
+            onMouseEnter={(e) =>
+              (e.target.style.backgroundColor = "rgba(154, 52, 142, 0.9)")
+            }
+            onMouseLeave={(e) =>
+              (e.target.style.backgroundColor = "rgb(154, 52, 142)")
+            }
+          >
+            Save Changes
+          </button>
         </div>
-    );
+      </header>
+
+      {/* Main Content */}
+      <main
+        style={{
+          maxWidth: "1024px",
+          margin: "auto",
+          padding: "32px 16px",
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+          {/* Card 1: Personal Information */}
+          <div
+            style={{
+              background: "rgba(255, 255, 255, 0.5)",
+              backdropFilter: "blur(4px)",
+              border: "1px solid rgba(230, 202, 179, 0.2)",
+              borderRadius: "12px",
+            }}
+          >
+            <div style={{ padding: "24px 24px 0" }}>
+              <h2
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  margin: "0",
+                  color: "rgb(16, 8, 43)",
+                  fontFamily: fontFamily,
+                }}
+              >
+                Personal Information
+              </h2>
+            </div>
+
+            <div style={{ padding: "0 24px 24px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "24px",
+                }}
+              >
+                {/* Cookbook Name */}
+                <div>
+                  <label
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      color: "rgb(16, 8, 43)",
+                      marginBottom: "8px",
+                      display: "block",
+                      fontFamily: fontFamily,
+                    }}
+                  >
+                    Cookbook Name
+                  </label>
+                  <input
+                    type="text"
+                    value={cookbookName}
+                    onChange={handleCookbookNameChange}
+                    style={{
+                      width: "100%",
+                      background: "rgba(255, 255, 255, 0.5)",
+                      border: "1px solid rgba(230, 202, 179, 0.3)",
+                      borderRadius: "6px",
+                      padding: "8px 12px",
+                      fontSize: "14px",
+                      color: "rgb(16, 8, 43)",
+                      fontFamily: fontFamily,
+                      outline: "none",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      color: "rgba(16, 8, 43, 0.6)",
+                      marginTop: "4px",
+                      margin: "4px 0 0 0",
+                      fontFamily: fontFamily,
+                    }}
+                  >
+                    This appears in your cookbook header and footer
+                  </p>
+                </div>
+
+                {/* Display Name */}
+                <div>
+                  <label
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      color: "rgb(16, 8, 43)",
+                      marginBottom: "8px",
+                      display: "block",
+                      fontFamily: fontFamily,
+                    }}
+                  >
+                    Display Name
+                  </label>
+                  <input
+                    type="text"
+                    value={displayName}
+                    onChange={handleDisplayNameChange}
+                    style={{
+                      width: "100%",
+                      background: "rgba(255, 255, 255, 0.5)",
+                      border: "1px solid rgba(230, 202, 179, 0.3)",
+                      borderRadius: "6px",
+                      padding: "8px 12px",
+                      fontSize: "14px",
+                      color: "rgb(16, 8, 43)",
+                      fontFamily: fontFamily,
+                      outline: "none",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      color: "rgba(16, 8, 43, 0.6)",
+                      marginTop: "4px",
+                      margin: "4px 0 0 0",
+                      fontFamily: fontFamily,
+                    }}
+                  >
+                    How you'd like to be greeted on the homepage
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: Theme Selection */}
+          <div
+            style={{
+              background: "rgba(255, 255, 255, 0.5)",
+              backdropFilter: "blur(4px)",
+              border: "1px solid rgba(230, 202, 179, 0.2)",
+              borderRadius: "12px",
+            }}
+          >
+            <div style={{ padding: "24px 24px 0" }}>
+              <h2
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  margin: "0",
+                  color: "rgb(16, 8, 43)",
+                  fontFamily: fontFamily,
+                }}
+              >
+                Theme Selection
+              </h2>
+            </div>
+
+            <div style={{ padding: "0 24px 24px" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+                  gap: "16px",
+                }}
+              >
+                {themes.map((theme) => (
+                  <div
+                    key={theme.id}
+                    onClick={() => setSelectedTheme(theme.id)}
+                    style={{
+                      width: "100%",
+                      height: "96px",
+                      borderRadius: "8px",
+                      border:
+                        theme.id === "winsome"
+                          ? "2px solid rgb(252, 161, 126)"
+                          : "1px solid rgba(230, 202, 179, 0.3)",
+                      background: theme.gradient,
+                      padding: "12px",
+                      cursor: "pointer",
+                      position: "relative",
+                      transition: "border-color 0.2s ease",
+                      boxSizing: "border-box",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (theme.id !== "winsome") {
+                        e.target.style.borderColor = "rgba(230, 202, 179, 0.6)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (theme.id !== "winsome") {
+                        e.target.style.borderColor = "rgba(230, 202, 179, 0.3)";
+                      }
+                    }}
+                  >
+                    {/* Color Dots */}
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "4px",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      {theme.colors.map((color, index) => (
+                        <div
+                          key={index}
+                          style={{
+                            width: "8px",
+                            height: "8px",
+                            borderRadius: "50%",
+                            background: color,
+                          }}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Theme Name */}
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: "500",
+                        color: "rgb(16, 8, 43)",
+                        fontFamily: fontFamily,
+                      }}
+                    >
+                      {theme.name}
+                    </div>
+
+                    {/* Selected Indicator */}
+                    {theme.id === "winsome" && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "-8px",
+                          right: "-8px",
+                          width: "24px",
+                          height: "24px",
+                          background: "rgb(252, 161, 126)",
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: "12px",
+                            height: "12px",
+                            background: "rgb(16, 8, 43)",
+                            borderRadius: "50%",
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3: App Preferences */}
+          <div
+            style={{
+              background: "rgba(255, 255, 255, 0.5)",
+              backdropFilter: "blur(4px)",
+              border: "1px solid rgba(230, 202, 179, 0.2)",
+              borderRadius: "12px",
+            }}
+          >
+            <div style={{ padding: "24px 24px 0" }}>
+              <h2
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  margin: "0",
+                  color: "rgb(16, 8, 43)",
+                  fontFamily: fontFamily,
+                }}
+              >
+                App Preferences
+              </h2>
+            </div>
+
+            <div style={{ padding: "0 24px 24px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "16px",
+                }}
+              >
+                {/* Auto-save */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontWeight: "500",
+                        color: "rgb(16, 8, 43)",
+                        fontFamily: fontFamily,
+                      }}
+                    >
+                      Auto-save Changes
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        color: "rgba(16, 8, 43, 0.6)",
+                        fontFamily: fontFamily,
+                      }}
+                    >
+                      Automatically save your preferences
+                    </div>
+                  </div>
+                  <button
+                    style={{
+                      border: "1px solid rgba(230, 202, 179, 0.3)",
+                      borderRadius: "4px",
+                      padding: "4px 8px",
+                      fontSize: "12px",
+                      opacity: "0.5",
+                      cursor: "not-allowed",
+                      background: "transparent",
+                      color: "rgb(16, 8, 43)",
+                      fontFamily: fontFamily,
+                    }}
+                  >
+                    Enabled
+                  </button>
+                </div>
+
+                {/* Dark Mode */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontWeight: "500",
+                        color: "rgb(16, 8, 43)",
+                        fontFamily: fontFamily,
+                      }}
+                    >
+                      Dark Mode
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        color: "rgba(16, 8, 43, 0.6)",
+                        fontFamily: fontFamily,
+                      }}
+                    >
+                      Switch to dark theme
+                    </div>
+                  </div>
+                  <button
+                    style={{
+                      border: "1px solid rgba(230, 202, 179, 0.3)",
+                      borderRadius: "4px",
+                      padding: "4px 8px",
+                      fontSize: "12px",
+                      opacity: "0.5",
+                      cursor: "not-allowed",
+                      background: "transparent",
+                      color: "rgb(16, 8, 43)",
+                      fontFamily: fontFamily,
+                    }}
+                  >
+                    Coming Soon
+                  </button>
+                </div>
+
+                {/* Export Data */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontWeight: "500",
+                        color: "rgb(16, 8, 43)",
+                        fontFamily: fontFamily,
+                      }}
+                    >
+                      Export Recipes
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        color: "rgba(16, 8, 43, 0.6)",
+                        fontFamily: fontFamily,
+                      }}
+                    >
+                      Download your recipes as PDF
+                    </div>
+                  </div>
+                  <button
+                    style={{
+                      border: "1px solid rgba(230, 202, 179, 0.3)",
+                      borderRadius: "4px",
+                      padding: "4px 8px",
+                      fontSize: "12px",
+                      opacity: "0.5",
+                      cursor: "not-allowed",
+                      background: "transparent",
+                      color: "rgb(16, 8, 43)",
+                      fontFamily: fontFamily,
+                    }}
+                  >
+                    Coming Soon
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
 };
 
 export default SettingsPage;

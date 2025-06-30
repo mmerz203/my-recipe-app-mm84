@@ -1,299 +1,357 @@
-// src/components/AddEditRecipeForm.jsx
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import Modal from './Modal'; // Import Modal component from the same 'components' folder
-import OCRInput from './OCRInput'; // Import OCRInput component from the same 'components' folder
-import Button from './Button';
+// Sophisticated Add/Edit Recipe Form for Winsome Designs
+import React, { useState, useEffect } from "react";
+import Button from "./ui/Button";
+import Card from "./ui/Card";
+import { BackIcon } from "./icons/WinsomeIcons";
 
 const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel }) => {
-    const [recipe, setRecipe] = useState(initialRecipe || {
-        name: '',
-        servings: '',
-        ingredients: [],
-        instructions: [],
-        imageUrl: '',
-        category: 'Main Course',
-        isPublic: false
-    });
-    const [ingredientInput, setIngredientInput] = useState('');
-    const [instructionInput, setInstructionInput] = useState('');
-    const [imageFile, setImageFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState(initialRecipe?.imageUrl || '');
-    const [modal, setModal] = useState({ show: false, title: '', message: '', onConfirm: null, showConfirm: false });
+  const [recipe, setRecipe] = useState(
+    initialRecipe || {
+      name: "",
+      category: "Main Course",
+      servings: "",
+      prepTime: "",
+      cookTime: "",
+      description: "",
+      ingredients: [],
+      instructions: [],
+      imageUrl: "",
+      isPublic: false,
+    },
+  );
 
-    // --- Baking/Cooking Mode State ---
-    const [isBakingRecipe, setIsBakingRecipe] = useState(false);
+  const [ingredientInput, setIngredientInput] = useState("");
+  const [instructionInput, setInstructionInput] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(
+    initialRecipe?.imageUrl || "",
+  );
 
-    // Heuristic detection for baking (run on name/ingredients change)
-    useEffect(() => {
-        const strongTitle = /cake|bread|cookie|pie|muffin|scone|brownie|pastry|tart/i;
-        const strongIngr = /baking powder|baking soda|yeast/i;
-        const secondaryIngr = /flour|granulated sugar|brown sugar|confectioners'? sugar/i;
-        const weightUnits = /gram|g|ounce|oz/i;
-        const cookingTitle = /soup|stew|curry|casserole|stir-fry|roast|grill/i;
-        const cookingIngr = /meat|broth|stock|vegetable/i;
-        let score = 0;
-        if (strongTitle.test(recipe.name)) score += 3;
-        if (recipe.ingredients.some(ing => strongIngr.test(ing))) score += 3;
-        if (recipe.ingredients.some(ing => secondaryIngr.test(ing))) score += 1;
-        if (recipe.ingredients.filter(ing => weightUnits.test(ing)).length > 1) score += 1;
-        if (cookingTitle.test(recipe.name)) score -= 2;
-        if (recipe.ingredients.some(ing => cookingIngr.test(ing))) score -= 1;
-        setIsBakingRecipe(score >= 3);
-    }, [recipe.name, recipe.ingredients]);
+  // Update state when initialRecipe changes (for editing)
+  useEffect(() => {
+    if (initialRecipe) {
+      setRecipe({
+        ...initialRecipe,
+        ingredients: initialRecipe.ingredients || [],
+        instructions: initialRecipe.instructions || [],
+      });
+      setIngredientInput(
+        initialRecipe.ingredients ? initialRecipe.ingredients.join("\n") : "",
+      );
+      setInstructionInput(
+        initialRecipe.instructions ? initialRecipe.instructions.join("\n") : "",
+      );
+      setImagePreview(initialRecipe.imageUrl || "");
+      setImageFile(null);
+    }
+  }, [initialRecipe]);
 
-    // Update state when initialRecipe changes (for editing)
-    useEffect(() => {
-        if (initialRecipe) {
-            setRecipe({
-                ...initialRecipe,
-                ingredients: initialRecipe.ingredients || [],
-                instructions: initialRecipe.instructions || []
-            });
-            setIngredientInput(initialRecipe.ingredients ? initialRecipe.ingredients.join('\n') : '');
-            setInstructionInput(initialRecipe.instructions ? initialRecipe.instructions.join('\n') : '');
-            setImagePreview(initialRecipe.imageUrl || '');
-            setImageFile(null);
-        } else {
-            setRecipe({
-                name: '',
-                servings: '',
-                ingredients: [],
-                instructions: [],
-                imageUrl: '',
-                category: 'Main Course',
-                isPublic: false
-            });
-            setIngredientInput('');
-            setInstructionInput('');
-            setImagePreview('');
-            setImageFile(null);
-        }
-    }, [initialRecipe]);
+  const categories = [
+    "Appetizer",
+    "Main Course",
+    "Side Dish",
+    "Dessert",
+    "Breakfast",
+    "Soup",
+    "Salad",
+    "Drink",
+    "Baking",
+    "Other",
+  ];
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setRecipe(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setRecipe((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImageFile(null);
+      setImagePreview(recipe.imageUrl || "");
+    }
+  };
+
+  const handleIngredientInput = (e) => {
+    setIngredientInput(e.target.value);
+    setRecipe((prev) => ({
+      ...prev,
+      ingredients: e.target.value
+        .split("\n")
+        .filter((line) => line.trim() !== ""),
+    }));
+  };
+
+  const handleInstructionInput = (e) => {
+    setInstructionInput(e.target.value);
+    setRecipe((prev) => ({
+      ...prev,
+      instructions: e.target.value
+        .split("\n")
+        .filter((line) => line.trim() !== ""),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    let finalImageUrl = recipe.imageUrl;
+    if (imageFile) {
+      finalImageUrl = imagePreview; // In production, upload to storage
+    }
+
+    const recipeToSave = {
+      ...recipe,
+      servings: parseFloat(recipe.servings) || 1,
+      imageUrl: finalImageUrl,
+      ingredients: ingredientInput
+        .split("\n")
+        .filter((line) => line.trim() !== ""),
+      instructions: instructionInput
+        .split("\n")
+        .filter((line) => line.trim() !== ""),
     };
 
-    const handleImageUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImageFile(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
-        } else {
-            setImageFile(null);
-            setImagePreview(recipe.imageUrl || ''); // Revert to existing image if no new file
-        }
-    };
+    onSave(recipeToSave);
+  };
 
-    const handleIngredientInput = (e) => {
-        setIngredientInput(e.target.value);
-        setRecipe(prev => ({ ...prev, ingredients: e.target.value.split('\n').filter(line => line.trim() !== '') }));
-    };
-
-    const handleInstructionInput = (e) => {
-        setInstructionInput(e.target.value);
-        setRecipe(prev => ({ ...prev, instructions: e.target.value.split('\n').filter(line => line.trim() !== '') }));
-    };
-
-    const handleRecipeParsedFromOCR = (parsedRecipe) => {
-        setRecipe(prev => ({
-            ...prev,
-            name: parsedRecipe.name || prev.name,
-            servings: parsedRecipe.servings || prev.servings,
-            ingredients: parsedRecipe.ingredients || prev.ingredients,
-            instructions: parsedRecipe.instructions || prev.instructions
-        }));
-        setIngredientInput(parsedRecipe.ingredients ? parsedRecipe.ingredients.join('\n') : ingredientInput);
-        setInstructionInput(parsedRecipe.instructions ? parsedRecipe.instructions.join('\n') : instructionInput);
-
-        setModal({
-            show: true,
-            title: "OCR Successful",
-            message: "Recipe details have been extracted. Please review and edit if necessary.",
-            onClose: () => setModal({ ...modal, show: false })
-        });
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        // In a real app, image upload to storage (e.g., Firebase Storage) would happen here
-        // For this demo, if a new image file is selected, we'll store its Data URL directly
-        let finalImageUrl = recipe.imageUrl;
-        if (imageFile) {
-            finalImageUrl = imagePreview; // Data URL from preview
-        }
-
-        const recipeToSave = {
-            ...recipe,
-            servings: parseFloat(recipe.servings) || 1, // Ensure servings is a number
-            imageUrl: finalImageUrl,
-            ingredients: ingredientInput.split('\n').filter(line => line.trim() !== ''),
-            instructions: instructionInput.split('\n').filter(line => line.trim() !== ''),
-            isBakingRecipe,
-        };
-        onSave(recipeToSave);
-    };
-
-    const categories = ['Appetizer', 'Main Course', 'Side Dish', 'Dessert', 'Breakfast', 'Soup', 'Salad', 'Drink', 'Baking', 'Other'];
-
-    return (
-        <div className="p-8 bg-transparent rounded-2xl shadow-xl max-w-3xl mx-auto border border-gray-200">
-            <Modal
-                show={modal.show}
-                title={modal.title}
-                message={modal.message}
-                onClose={modal.onClose}
-                onConfirm={modal.onConfirm}
-                showConfirm={modal.showConfirm}
-            />
-            <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">{initialRecipe ? 'Edit Recipe' : 'Add New Recipe'} (Recipe Input)</h2>
-
-            {/* Remove double-layered text by not rendering OCRInput's message as a separate block here */}
-            <OCRInput onRecipeParsed={handleRecipeParsedFromOCR} />
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                    <label htmlFor="name" className="block text-gray-700 text-base font-bold mb-2">Recipe Name:</label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={recipe.name}
-                        onChange={handleChange}
-                        required
-                        className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150"
-                        placeholder="e.g., Classic Spaghetti Carbonara"
-                    />
-                </div>
-
-                <div>
-                    <label htmlFor="category" className="block text-gray-700 text-base font-bold mb-2">Category:</label>
-                    <select
-                        id="category"
-                        name="category"
-                        value={recipe.category}
-                        onChange={handleChange}
-                        className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150"
-                    >
-                        {categories.map(cat => (
-                            <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                    </select>
-                </div>
-
-                <div>
-                    <label htmlFor="servings" className="block text-gray-700 text-base font-bold mb-2">Servings (Original):</label>
-                    <input
-                        type="text"
-                        id="servings"
-                        name="servings"
-                        value={recipe.servings}
-                        onChange={handleChange}
-                        placeholder="e.g., 4, 6-8, 12"
-                        className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150"
-                    />
-                </div>
-
-                {/* --- Baking/Cooking Toggle --- */}
-                <div className="flex items-center mt-2 mb-4">
-                    <input
-                        type="checkbox"
-                        id="isBakingRecipe"
-                        checked={isBakingRecipe}
-                        onChange={e => setIsBakingRecipe(e.target.checked)}
-                        className="form-checkbox h-5 w-5 text-green-600 rounded-md border-gray-300 focus:ring-green-500"
-                    />
-                    <label htmlFor="isBakingRecipe" className="ml-3 text-gray-700 text-base font-bold">
-                        Treat as Baking Recipe (Exact Measurements)
-                    </label>
-                </div>
-
-                <div>
-                    <label htmlFor="ingredients" className="block text-gray-700 text-base font-bold mb-2">Ingredients (one per line):</label>
-                    <textarea
-                        id="ingredients"
-                        name="ingredients"
-                        value={ingredientInput}
-                        onChange={handleIngredientInput}
-                        rows="8"
-                        required
-                        className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150 resize-y overflow-auto min-h-[8rem] max-h-60"
-                        placeholder="e.g.,\n1 cup all-purpose flour\n2 large eggs\n1/2 teaspoon salt"
-                    ></textarea>
-                </div>
-
-                <div>
-                    <label htmlFor="instructions" className="block text-gray-700 text-base font-bold mb-2">Instructions (one step per line):</label>
-                    <textarea
-                        id="instructions"
-                        name="instructions"
-                        value={instructionInput}
-                        onChange={handleInstructionInput}
-                        rows="8"
-                        required
-                        className="shadow-sm border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150 resize-y overflow-auto min-h-[8rem] max-h-60"
-                        placeholder="e.g.,\nPreheat oven to 375°F (190°C).\nIn a large bowl, whisk together flour and sugar."
-                    ></textarea>
-                </div>
-
-                <div>
-                    <label htmlFor="imageUrl" className="block text-gray-700 text-base font-bold mb-2">Recipe Image:</label>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="block w-full text-sm text-gray-700
-                                    file:mr-4 file:py-2 file:px-4
-                                    file:rounded-full file:border-0
-                                    file:text-sm file:font-semibold
-                                    file:bg-green-100 file:text-green-700
-                                    hover:file:bg-green-200 cursor-pointer mb-2"
-                    />
-                    {imagePreview && (
-                        <img src={imagePreview} alt="Recipe Preview" className="mt-4 max-w-full h-48 object-cover rounded-lg shadow-md border border-gray-200" />
-                    )}
-                    <p className="text-xs text-gray-500 mt-1">If no image uploaded, a default placeholder will be used.</p>
-                </div>
-
-                <div className="flex items-center pt-4">
-                    <input
-                        type="checkbox"
-                        id="isPublic"
-                        name="isPublic"
-                        checked={recipe.isPublic}
-                        onChange={handleChange}
-                        className="form-checkbox h-5 w-5 text-green-600 rounded-md border-gray-300 focus:ring-green-500"
-                    />
-                    <label htmlFor="isPublic" className="ml-3 text-gray-700 text-base font-bold">Make Public (Shareable with other users)</label>
-                </div>
-
-                <div className="flex justify-end space-x-4 mt-8">
-                    <Button
-                        type="button"
-                        onClick={onCancel}
-                        className="bg-gray-300 text-gray-800 hover:bg-gray-400 focus:ring-gray-300 mr-2"
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        type="submit"
-                        className="bg-green-600 hover:bg-green-700 focus:ring-green-500"
-                    >
-                        Save Recipe
-                    </Button>
-                </div>
-            </form>
+  return (
+    <div className="min-h-screen bg-winsome-background-light py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8">
+          <Button onClick={onCancel} variant="ghost" size="sm" className="mb-4">
+            <BackIcon className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <h1 className="text-3xl lg:text-4xl font-bold text-winsome-text-dark">
+            {initialRecipe ? "Edit Recipe" : "Add New Recipe"}
+          </h1>
         </div>
-    );
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* OCR Upload Section */}
+          <Card className="p-6 border-2 border-winsome-primary-brand/30 bg-winsome-primary-brand/5">
+            <h3 className="text-xl font-bold text-winsome-text-dark mb-4">
+              📷 OCR Recipe Scanner
+            </h3>
+            <p className="text-winsome-text-dark/70 mb-4">
+              Upload a photo of a recipe to automatically extract ingredients
+              and instructions.
+            </p>
+            <input
+              type="file"
+              accept="image/*"
+              className="block w-full text-sm text-winsome-text-dark file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-winsome-primary-brand file:text-white hover:file:bg-winsome-secondary-brand"
+            />
+          </Card>
+
+          {/* Recipe Details */}
+          <Card className="p-8">
+            <h2 className="text-2xl font-bold text-winsome-text-dark mb-6">
+              Recipe Details
+            </h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Recipe Title */}
+              <div className="lg:col-span-2">
+                <label className="block text-winsome-text-dark text-sm font-bold mb-2">
+                  Recipe Title *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={recipe.name}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border-2 border-winsome-neutral-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-winsome-primary-brand focus:border-winsome-primary-brand transition-all duration-300"
+                  placeholder="e.g., Grandma's Chocolate Chip Cookies"
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className="block text-winsome-text-dark text-sm font-bold mb-2">
+                  Category
+                </label>
+                <select
+                  name="category"
+                  value={recipe.category}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border-2 border-winsome-neutral-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-winsome-primary-brand focus:border-winsome-primary-brand transition-all duration-300"
+                >
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Servings */}
+              <div>
+                <label className="block text-winsome-text-dark text-sm font-bold mb-2">
+                  Servings
+                </label>
+                <input
+                  type="text"
+                  name="servings"
+                  value={recipe.servings}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border-2 border-winsome-neutral-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-winsome-primary-brand focus:border-winsome-primary-brand transition-all duration-300"
+                  placeholder="e.g., 4-6 people"
+                />
+              </div>
+
+              {/* Prep Time */}
+              <div>
+                <label className="block text-winsome-text-dark text-sm font-bold mb-2">
+                  Prep Time
+                </label>
+                <input
+                  type="text"
+                  name="prepTime"
+                  value={recipe.prepTime}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border-2 border-winsome-neutral-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-winsome-primary-brand focus:border-winsome-primary-brand transition-all duration-300"
+                  placeholder="e.g., 15 minutes"
+                />
+              </div>
+
+              {/* Cook Time */}
+              <div>
+                <label className="block text-winsome-text-dark text-sm font-bold mb-2">
+                  Cook Time
+                </label>
+                <input
+                  type="text"
+                  name="cookTime"
+                  value={recipe.cookTime}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border-2 border-winsome-neutral-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-winsome-primary-brand focus:border-winsome-primary-brand transition-all duration-300"
+                  placeholder="e.g., 25 minutes"
+                />
+              </div>
+
+              {/* Description */}
+              <div className="lg:col-span-2">
+                <label className="block text-winsome-text-dark text-sm font-bold mb-2">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={recipe.description}
+                  onChange={handleChange}
+                  rows="3"
+                  className="w-full px-4 py-3 border-2 border-winsome-neutral-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-winsome-primary-brand focus:border-winsome-primary-brand transition-all duration-300 resize-none"
+                  placeholder="Brief description of the recipe..."
+                />
+              </div>
+            </div>
+          </Card>
+
+          {/* Ingredients */}
+          <Card className="p-8">
+            <h2 className="text-2xl font-bold text-winsome-text-dark mb-6">
+              Ingredients
+            </h2>
+            <label className="block text-winsome-text-dark text-sm font-bold mb-2">
+              List ingredients (one per line)
+            </label>
+            <textarea
+              value={ingredientInput}
+              onChange={handleIngredientInput}
+              rows="8"
+              required
+              className="w-full px-4 py-3 border-2 border-winsome-neutral-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-winsome-primary-brand focus:border-winsome-primary-brand transition-all duration-300 resize-y"
+              placeholder="1 cup all-purpose flour&#10;2 large eggs&#10;1/2 teaspoon salt&#10;..."
+            />
+          </Card>
+
+          {/* Instructions */}
+          <Card className="p-8">
+            <h2 className="text-2xl font-bold text-winsome-text-dark mb-6">
+              Instructions
+            </h2>
+            <label className="block text-winsome-text-dark text-sm font-bold mb-2">
+              Step-by-step instructions (one step per line)
+            </label>
+            <textarea
+              value={instructionInput}
+              onChange={handleInstructionInput}
+              rows="8"
+              required
+              className="w-full px-4 py-3 border-2 border-winsome-neutral-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-winsome-primary-brand focus:border-winsome-primary-brand transition-all duration-300 resize-y"
+              placeholder="Preheat oven to 375°F (190°C)&#10;In a large bowl, whisk together flour and sugar&#10;..."
+            />
+          </Card>
+
+          {/* Recipe Image */}
+          <Card className="p-8">
+            <h2 className="text-2xl font-bold text-winsome-text-dark mb-6">
+              Recipe Image
+            </h2>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="block w-full text-sm text-winsome-text-dark file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-winsome-primary-brand file:text-white hover:file:bg-winsome-secondary-brand mb-4"
+            />
+            {imagePreview && (
+              <div className="mt-4">
+                <img
+                  src={imagePreview}
+                  alt="Recipe Preview"
+                  className="max-w-full h-64 object-cover rounded-xl border-2 border-winsome-neutral-subtle"
+                />
+              </div>
+            )}
+          </Card>
+
+          {/* Visibility Setting */}
+          <Card className="p-6">
+            <label className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                name="isPublic"
+                checked={recipe.isPublic}
+                onChange={handleChange}
+                className="w-5 h-5 text-winsome-primary-brand rounded focus:ring-winsome-primary-brand border-winsome-neutral-subtle"
+              />
+              <span className="text-winsome-text-dark font-medium">
+                Make this recipe public (visible to other users)
+              </span>
+            </label>
+          </Card>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 sm:justify-end">
+            <Button
+              type="button"
+              onClick={onCancel}
+              variant="outline"
+              size="lg"
+            >
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" size="lg">
+              {initialRecipe ? "Update Recipe" : "Save Recipe"}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 };
 
-export default AddEditRecipeForm; // Add this line
+export default AddEditRecipeForm;

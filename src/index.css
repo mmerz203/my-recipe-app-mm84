@@ -5,20 +5,36 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global Base Styles and Sticky Footer Setup - CRITICAL */
-html, body, #root {
-    height: 100%; /* Ensure html, body, and root div take full height */
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden; /* Prevents horizontal scrollbar issues */
-    box-sizing: border-box; /* Includes padding and border in element's total width/height */
+/* Global Base Styles - Sophisticated Winsome Design */
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-    font-family: "Inter", sans-serif; /* Your chosen font */
-    min-height: 100vh; /* Ensure body is at least full viewport height */
-    overflow-y: auto; /* Allow vertical scrolling if content overflows */
-    display: flex;         /* Make body a flex container */
-    flex-direction: column; /* Stack children vertically */
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  min-height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background: #f6dcca; /* Exact Winsome background: rgb(246, 220, 198) */
+  color: #10082b; /* Exact Winsome text: rgb(16, 8, 43) */
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Styles for the #root div where your React app mounts */
@@ -30,44 +46,120 @@ body {
 
 /* Styles for the footer - Moved from inline HTML style */
 footer {
-    width: 100%;
-    text-align: center;
-    padding-top: 40px; /* Space above footer content */
-    padding-bottom: 20px; /* Space below footer content */
-    color: #6b7280; /* Text color */
-    font-size: 0.9em; /* Font size */
-    background-color: transparent !important; /* Make footer background transparent */
-    flex-shrink: 0; /* Prevent footer from shrinking if content is too large */
-    /* Optionally, add backdrop-blur or bg-opacity if you want a subtle effect */
+  width: 100%;
+  text-align: center;
+  padding-top: 40px; /* Space above footer content */
+  padding-bottom: 20px; /* Space below footer content */
+  color: #6b7280; /* Text color */
+  font-size: 0.9em; /* Font size */
+  background-color: transparent !important; /* Make footer background transparent */
+  flex-shrink: 0; /* Prevent footer from shrinking if content is too large */
+  /* Optionally, add backdrop-blur or bg-opacity if you want a subtle effect */
 }
 
 /* Explicitly ensure no animations on home component elements (important for consistency) */
-.HomeComponent h1, .HomeComponent p, .HomeComponent button {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
+.HomeComponent h1,
+.HomeComponent p,
+.HomeComponent button {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
 }
 /* Explicitly ensure no animations on recipe list items (from original giant block) */
 .RecipeList .group {
-    transition: none !important;
-    transform: none !important;
+  transition: none !important;
+  transform: none !important;
 }
 .RecipeList .group:hover {
-    transform: none !important;
-    box-shadow: none !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 .RecipeList .group img {
-    transition: none !important;
-    transform: none !important;
+  transition: none !important;
+  transform: none !important;
 }
 
 /* General Responsive Adjustments (from original giant block) */
 @media (max-width: 640px) {
-    .HomeComponent button {
-        width: 100%;
-    }
+  .HomeComponent button {
+    width: 100%;
+  }
 }
 /* Custom text shadow for theme preview (from original giant block) */
 .text-shadow-sm {
-    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Sophisticated Winsome Designs Utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Sophisticated scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(238, 238, 238, 0.5);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #da627d, #9a348e);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #9a348e, #da627d);
+}
+
+/* Focus styles for accessibility */
+.focus-visible:focus {
+  outline: 2px solid #fca17d;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for interactive elements */
+button,
+a,
+input,
+select,
+textarea {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Remove default focus outline and add custom one */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid #fca17d;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Ensure images are responsive */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Sophisticated backdrop blur support */
+@supports (backdrop-filter: blur(10px)) {
+  .backdrop-blur-sm {
+    backdrop-filter: blur(10px);
+  }
 }
