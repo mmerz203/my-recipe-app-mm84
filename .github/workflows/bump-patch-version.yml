@@ -1,0 +1,38 @@
+name: Auto Patch Version Bump
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Bump patch version
+        run: |
+          current_version=$(jq -r .version package.json)
+          IFS='.' read -r major minor patch <<< "$current_version"
+          patch=$((patch + 1))
+          new_version="$major.$minor.$patch"
+          jq --arg v "$new_version" '.version = $v' package.json > tmp.json && mv tmp.json package.json
+          echo "Bumped version to $new_version"
+
+      - name: Commit and push version bump
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add package.json
+          git commit -m "ci: bump patch version [skip ci]" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
