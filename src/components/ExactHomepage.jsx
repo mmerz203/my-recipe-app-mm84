@@ -1,5 +1,6 @@
 // Exact Winsome Designs Homepage - Pixel Perfect Implementation
-import React from "react";
+import React, { useContext } from "react";
+import { UserPreferencesContext } from "../contexts/UserPreferencesContext";
 
 // Exact font family from specifications
 const fontFamily =
@@ -89,25 +90,101 @@ const CustomizeIcon = ({ size = 32 }) => (
   </svg>
 );
 
+// Helper to add alpha to hex or rgb color
+function withAlpha(color, alpha) {
+  if (!color) return '';
+  if (color.startsWith('#')) {
+    let hex = color.replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(x => x + x).join('');
+    const num = parseInt(hex, 16);
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+  if (color.startsWith('rgb(')) {
+    return color.replace('rgb(', 'rgba(').replace(')', `,${alpha})`);
+  }
+  if (color.startsWith('rgba(')) {
+    return color;
+  }
+  return color;
+}
+
+// Inject theme palette as CSS variables on :root
+function setThemeCSSVariables(theme) {
+  if (!theme) return;
+  const root = document.documentElement;
+  Object.entries(theme).forEach(([key, value]) => {
+    root.style.setProperty(`--color-${key}`, value);
+  });
+}
+
+
 const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
+  const { preferences } = useContext(UserPreferencesContext);
+  const cookbookName = preferences.cookbookName && preferences.cookbookName.trim() !== "" ? preferences.cookbookName : "Winsome Designs";
+  const userName = preferences.userName && preferences.userName.trim() !== "" ? preferences.userName : "Chef";
+
+  // Theme palettes (should match global)
+  const themePalettes = {
+    winsome: {
+      background: "rgb(246, 220, 198)",
+      primary: "rgb(252, 161, 126)",
+      secondary: "rgb(218, 98, 125)",
+      accent: "rgb(154, 52, 142)",
+      text: "rgb(16, 8, 43)",
+    },
+    emerald: {
+      background: "#225560",
+      primary: "#3ddc97",
+      secondary: "#3d2b3d",
+      accent: "#3ddc97",
+      text: "#f0fdfa",
+    },
+    rustic: {
+      background: "#f2e791",
+      primary: "#a57f60",
+      secondary: "#c880b7",
+      accent: "#a57f60",
+      text: "#3d2b1f",
+    },
+    ocean: {
+      background: "#E0F1FF",
+      primary: "#4F8EF7",
+      secondary: "#235390",
+      accent: "#38B6FF",
+      text: "#10243B",
+    },
+  };
+  const themeKey = preferences.theme && typeof preferences.theme === 'object' && preferences.theme.id
+    ? preferences.theme.id
+    : (typeof preferences.theme === 'string' ? preferences.theme : 'winsome');
+  const currentTheme = themePalettes[themeKey] || themePalettes["winsome"];
+
+  // Set CSS variables globally for the current theme
+  React.useEffect(() => {
+    setThemeCSSVariables(currentTheme);
+  }, [currentTheme]);
+
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "rgb(246, 220, 198)",
+        background: "var(--color-background)",
         fontFamily: fontFamily,
         fontSize: "16px",
         fontWeight: "400",
         lineHeight: "24px",
-        color: "rgb(16, 8, 43)",
+        color: "var(--color-text)",
       }}
     >
       {/* Header */}
       <header
         style={{
           padding: "24px 16px",
-          background: "rgb(246, 220, 198)",
-          borderBottom: "1px solid rgba(230, 202, 179, 0.2)",
+          background: "var(--color-background)",
+          borderBottom: `1px solid ${withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-accent') || currentTheme.accent, 0.2)}`,
         }}
       >
         <div
@@ -125,7 +202,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               style={{
                 width: "40px",
                 height: "40px",
-                background: "rgb(252, 161, 126)",
+                background: "var(--color-primary)",
                 borderRadius: "12px",
                 display: "flex",
                 alignItems: "center",
@@ -140,12 +217,12 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                 fontWeight: "700",
                 lineHeight: "32px",
                 marginLeft: "12px",
-                color: "rgb(16, 8, 43)",
+                color: "var(--color-text)",
                 margin: "0 0 0 12px",
                 fontFamily: fontFamily,
               }}
             >
-              Winsome Designs
+              {cookbookName}
             </h1>
           </div>
 
@@ -163,9 +240,10 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              color: "var(--color-text)",
             }}
             onMouseEnter={(e) =>
-              (e.target.style.backgroundColor = "rgba(255, 255, 255, 0.2)")
+              (e.target.style.backgroundColor = withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-primary') || currentTheme.primary, 0.2))
             }
             onMouseLeave={(e) =>
               (e.target.style.backgroundColor = "transparent")
@@ -198,12 +276,12 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               fontWeight: "700",
               lineHeight: "40px",
               marginBottom: "16px",
-              color: "rgb(16, 8, 43)",
+              color: currentTheme.text,
               margin: "0 0 16px 0",
               fontFamily: fontFamily,
             }}
           >
-            Welcome, Chef!
+            Welcome, {userName}!
           </h2>
           <p
             style={{
@@ -234,7 +312,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
           {/* View All Recipes Card - Exact Specifications */}
           <div
             style={{
-              background: "rgba(255, 255, 255, 0.5)",
+              background: withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-background') || currentTheme.background, 0.5),
               backdropFilter: "blur(4px)",
               borderRadius: "12px",
               border: "2px solid transparent",
@@ -244,7 +322,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               display: "flex",
               flexDirection: "column",
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              boxShadow: "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+              boxShadow: withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.05) + " 0px 1px 2px 0px",
               cursor: "pointer",
             }}
             onClick={onViewAllRecipes}
@@ -252,15 +330,15 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
             data-testid="view-all-recipes-card"
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "scale(1.02)";
-              e.currentTarget.style.borderColor = "rgba(252, 161, 126, 0.3)";
+              e.currentTarget.style.borderColor = withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-primary') || currentTheme.primary, 0.3);
               e.currentTarget.style.boxShadow =
-                "0 25px 50px -12px rgba(0, 0, 0, 0.25)";
+                "0 25px 50px -12px " + withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.25);
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "scale(1)";
               e.currentTarget.style.borderColor = "transparent";
               e.currentTarget.style.boxShadow =
-                "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px";
+                withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.05) + " 0px 1px 2px 0px";
             }}
           >
             {/* Icon Circle */}
@@ -268,7 +346,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               style={{
                 width: "64px",
                 height: "64px",
-                background: "rgb(252, 161, 126)",
+                background: currentTheme.primary,
                 borderRadius: "16px",
                 margin: "0 auto 24px",
                 display: "flex",
@@ -287,7 +365,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               style={{
                 fontSize: "20px",
                 fontWeight: "600",
-                color: "rgb(16, 8, 43)",
+                color: currentTheme.text,
                 marginBottom: "16px",
                 margin: "0 0 16px 0",
                 fontFamily: fontFamily,
@@ -299,7 +377,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
             {/* Card Description */}
             <p
               style={{
-                color: "rgba(16, 8, 43, 0.6)",
+                color: withAlpha(currentTheme.text, 0.6),
                 fontWeight: "400",
                 flexGrow: "1",
                 lineHeight: "1.5",
@@ -320,8 +398,8 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               style={{
                 width: "100%",
                 marginTop: "24px",
-                background: "rgb(252, 161, 126)",
-                color: "rgb(16, 8, 43)",
+                background: "var(--color-primary)",
+                color: "var(--color-text)",
                 fontWeight: "600",
                 padding: "12px 16px",
                 borderRadius: "12px",
@@ -332,10 +410,10 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                 fontSize: "14px",
               }}
               onMouseEnter={(e) =>
-                (e.target.style.background = "rgba(252, 161, 126, 0.9)")
+                (e.target.style.background = withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-primary') || currentTheme.primary, 0.9))
               }
               onMouseLeave={(e) =>
-                (e.target.style.background = "rgb(252, 161, 126)")
+                (e.target.style.background = getComputedStyle(document.documentElement).getPropertyValue('--color-primary') || currentTheme.primary)
               }
             >
               Browse Recipes
@@ -345,7 +423,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
           {/* Add New Recipe Card */}
           <div
             style={{
-              background: "rgba(255, 255, 255, 0.5)",
+              background: withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-background') || currentTheme.background, 0.5),
               backdropFilter: "blur(4px)",
               borderRadius: "12px",
               border: "2px solid transparent",
@@ -355,28 +433,28 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               display: "flex",
               flexDirection: "column",
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              boxShadow: "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+              boxShadow: withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.05) + " 0px 1px 2px 0px",
               cursor: "pointer",
             }}
             onClick={onAddRecipe}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "scale(1.02)";
-              e.currentTarget.style.borderColor = "rgba(218, 98, 125, 0.3)";
+              e.currentTarget.style.borderColor = withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-secondary') || currentTheme.secondary, 0.3);
               e.currentTarget.style.boxShadow =
-                "0 25px 50px -12px rgba(0, 0, 0, 0.25)";
+                "0 25px 50px -12px " + withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.25);
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "scale(1)";
               e.currentTarget.style.borderColor = "transparent";
               e.currentTarget.style.boxShadow =
-                "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px";
+                withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.05) + " 0px 1px 2px 0px";
             }}
           >
             <div
               style={{
                 width: "64px",
                 height: "64px",
-                background: "rgb(218, 98, 125)",
+                background: currentTheme.secondary,
                 borderRadius: "16px",
                 margin: "0 auto 24px",
                 display: "flex",
@@ -394,7 +472,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                 fontSize: "20px",
                 fontWeight: "600",
                 marginBottom: "16px",
-                color: "rgb(16, 8, 43)",
+                color: currentTheme.text,
                 margin: "0 0 16px 0",
                 fontFamily: fontFamily,
               }}
@@ -405,7 +483,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               style={{
                 fontSize: "16px",
                 fontWeight: "400",
-                color: "rgba(16, 8, 43, 0.6)",
+                color: withAlpha(currentTheme.text, 0.6),
                 flexGrow: "1",
                 margin: "0",
                 lineHeight: "1.5",
@@ -424,18 +502,18 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                 fontSize: "14px",
                 fontWeight: "600",
                 padding: "12px 16px",
-                background: "rgb(218, 98, 125)",
-                color: "white",
+                background: "var(--color-secondary)",
+                color: getComputedStyle(document.documentElement).getPropertyValue('--color-text') === '#f0fdfa' ? '#222' : 'white',
                 border: "none",
                 cursor: "pointer",
                 transition: "background-color 0.2s ease",
                 fontFamily: fontFamily,
               }}
               onMouseEnter={(e) =>
-                (e.target.style.background = "rgba(218, 98, 125, 0.9)")
+                (e.target.style.background = withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-secondary') || currentTheme.secondary, 0.9))
               }
               onMouseLeave={(e) =>
-                (e.target.style.background = "rgb(218, 98, 125)")
+                (e.target.style.background = getComputedStyle(document.documentElement).getPropertyValue('--color-secondary') || currentTheme.secondary)
               }
             >
               Create Recipe
@@ -445,7 +523,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
           {/* Customize Card */}
           <div
             style={{
-              background: "rgba(255, 255, 255, 0.5)",
+              background: withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-background') || currentTheme.background, 0.5),
               backdropFilter: "blur(4px)",
               borderRadius: "12px",
               border: "2px solid transparent",
@@ -455,28 +533,28 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               display: "flex",
               flexDirection: "column",
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              boxShadow: "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
+              boxShadow: withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.05) + " 0px 1px 2px 0px",
               cursor: "pointer",
             }}
             onClick={onCustomize}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "scale(1.02)";
-              e.currentTarget.style.borderColor = "rgba(154, 52, 142, 0.3)";
+              e.currentTarget.style.borderColor = withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-accent') || currentTheme.accent, 0.3);
               e.currentTarget.style.boxShadow =
-                "0 25px 50px -12px rgba(0, 0, 0, 0.25)";
+                "0 25px 50px -12px " + withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.25);
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "scale(1)";
               e.currentTarget.style.borderColor = "transparent";
               e.currentTarget.style.boxShadow =
-                "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px";
+                withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.05) + " 0px 1px 2px 0px";
             }}
           >
             <div
               style={{
                 width: "64px",
                 height: "64px",
-                background: "rgb(154, 52, 142)",
+                background: currentTheme.accent,
                 borderRadius: "16px",
                 margin: "0 auto 24px",
                 display: "flex",
@@ -494,7 +572,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                 fontSize: "20px",
                 fontWeight: "600",
                 marginBottom: "16px",
-                color: "rgb(16, 8, 43)",
+                color: currentTheme.text,
                 margin: "0 0 16px 0",
                 fontFamily: fontFamily,
               }}
@@ -505,7 +583,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               style={{
                 fontSize: "16px",
                 fontWeight: "400",
-                color: "rgba(16, 8, 43, 0.6)",
+                color: withAlpha(currentTheme.text, 0.6),
                 flexGrow: "1",
                 margin: "0",
                 lineHeight: "1.5",
@@ -526,18 +604,18 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                 fontSize: "14px",
                 fontWeight: "600",
                 padding: "12px 16px",
-                background: "rgb(154, 52, 142)",
-                color: "rgba(255, 255, 255, 1)",
+                background: "var(--color-accent)",
+                color: 'white',
                 border: "none",
                 cursor: "pointer",
                 transition: "background-color 0.2s ease",
                 fontFamily: fontFamily,
               }}
               onMouseEnter={(e) =>
-                (e.target.style.backgroundColor = "rgba(154, 52, 142, 0.9)")
+                (e.target.style.backgroundColor = withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-accent') || currentTheme.accent, 0.9))
               }
               onMouseLeave={(e) =>
-                (e.target.style.backgroundColor = "rgb(154, 52, 142)")
+                (e.target.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent') || currentTheme.accent)
               }
             >
               Settings
@@ -548,11 +626,11 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
         {/* Stats Dashboard */}
         <section
           style={{
-            background: "rgba(255, 255, 255, 0.3)",
+            background: withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-background') || currentTheme.background, 0.3),
             backdropFilter: "blur(4px)",
             borderRadius: "24px",
             padding: "32px",
-            border: "1px solid rgba(230, 202, 179, 0.2)",
+            border: `1px solid ${withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.2)}`,
             marginBottom: "64px",
           }}
         >
@@ -569,7 +647,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                   fontSize: "24px",
                   fontWeight: "700",
                   marginBottom: "8px",
-                  color: "rgb(252, 161, 126)",
+                  color: "var(--color-primary)",
                   fontFamily: fontFamily,
                 }}
               >
@@ -579,7 +657,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                 style={{
                   fontSize: "14px",
                   fontWeight: "400",
-                  color: "rgba(16, 8, 43, 0.6)",
+                  color: withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.6),
                   fontFamily: fontFamily,
                 }}
               >
@@ -593,7 +671,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                   fontSize: "24px",
                   fontWeight: "700",
                   marginBottom: "8px",
-                  color: "rgb(218, 98, 125)",
+                  color: "var(--color-secondary)",
                   fontFamily: fontFamily,
                 }}
               >
@@ -603,7 +681,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                 style={{
                   fontSize: "14px",
                   fontWeight: "400",
-                  color: "rgba(16, 8, 43, 0.6)",
+                  color: withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.6),
                   fontFamily: fontFamily,
                 }}
               >
@@ -617,7 +695,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                   fontSize: "24px",
                   fontWeight: "700",
                   marginBottom: "8px",
-                  color: "rgb(154, 52, 142)",
+                  color: "var(--color-accent)",
                   fontFamily: fontFamily,
                 }}
               >
@@ -627,7 +705,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                 style={{
                   fontSize: "14px",
                   fontWeight: "400",
-                  color: "rgba(16, 8, 43, 0.6)",
+                  color: withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.6),
                   fontFamily: fontFamily,
                 }}
               >
@@ -641,7 +719,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                   fontSize: "24px",
                   fontWeight: "700",
                   marginBottom: "8px",
-                  color: "rgb(252, 161, 126)",
+                  color: "var(--color-primary)",
                   fontFamily: fontFamily,
                 }}
               >
@@ -651,7 +729,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
                 style={{
                   fontSize: "14px",
                   fontWeight: "400",
-                  color: "rgba(16, 8, 43, 0.6)",
+                  color: withAlpha(getComputedStyle(document.documentElement).getPropertyValue('--color-text') || currentTheme.text, 0.6),
                   fontFamily: fontFamily,
                 }}
               >

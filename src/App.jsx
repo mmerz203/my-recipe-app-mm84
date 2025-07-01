@@ -125,46 +125,57 @@ const App = () => {
     ? recipes.find((r) => r.id === selectedRecipeId)
     : null;
 
-  const backgroundStyle = {};
   // --- THEME PALETTE SUPPORT ---
-  if (preferences.theme) {
-    if (preferences.theme.type === "color") {
-      backgroundStyle.backgroundColor = preferences.theme.value;
-    } else if (preferences.theme.type === "image") {
-      backgroundStyle.backgroundImage = `url(${preferences.theme.value})`;
-      backgroundStyle.backgroundSize = "cover";
-      backgroundStyle.backgroundPosition = "center";
-      backgroundStyle.backgroundAttachment = "fixed";
-    } else if (preferences.theme.type === "gradient") {
-      backgroundStyle.backgroundImage = preferences.theme.value;
-    } else if (
-      preferences.theme.type === "roles" &&
-      Array.isArray(preferences.theme.value)
-    ) {
-      // Find the background color from the palette roles
-      const bgRole = preferences.theme.value.find((c) =>
-        c.role.toLowerCase().includes("background"),
-      );
-      if (bgRole) {
-        backgroundStyle.backgroundColor = bgRole.hex;
-      } else {
-        backgroundStyle.backgroundColor = "#f3f4f6";
-      }
-    }
-  } else {
-    backgroundStyle.backgroundColor = "#f3f4f6";
-  }
+  // Define palettes for all themes
+  const themePalettes = {
+    winsome: {
+      background: "rgb(246, 220, 198)",
+      primary: "rgb(252, 161, 126)",
+      secondary: "rgb(218, 98, 125)",
+      accent: "rgb(154, 52, 142)",
+      text: "rgb(16, 8, 43)",
+    },
+    emerald: {
+      background: "#225560",
+      primary: "#3ddc97",
+      secondary: "#3d2b3d",
+      accent: "#3ddc97",
+      text: "#f0fdfa",
+    },
+    rustic: {
+      background: "#f2e791",
+      primary: "#a57f60",
+      secondary: "#c880b7",
+      accent: "#a57f60",
+      text: "#3d2b1f",
+    },
+    ocean: {
+      background: "#E0F1FF",
+      primary: "#4F8EF7",
+      secondary: "#235390",
+      accent: "#38B6FF",
+      text: "#10243B",
+    },
+  };
+
+
+  // Use preferences.theme.id if available, else fallback to string or 'winsome'
+  const themeKey = preferences.theme && typeof preferences.theme === 'object' && preferences.theme.id
+    ? preferences.theme.id
+    : (typeof preferences.theme === 'string' ? preferences.theme : 'winsome');
+  const currentTheme = themePalettes[themeKey] || themePalettes["winsome"];
+  // Remove debug logging after confirming fix
+  const backgroundStyle = {
+    minHeight: "100vh",
+    background: currentTheme.background,
+    fontFamily: "Inter, system-ui, -apple-system, sans-serif",
+    color: currentTheme.text,
+  };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "rgb(246, 220, 198)",
-        fontFamily: "Inter, system-ui, -apple-system, sans-serif",
-      }}
-    >
+    <div style={backgroundStyle}>
       {/* Header - only show on non-home views */}
-      {view !== "home" && <Header onSettings={() => setView("settings")} />}
+      {view !== "home" && <Header onSettings={() => setView("settings")} currentTheme={currentTheme} />}
 
       {/* Global Error Display */}
       {appError && (
@@ -243,7 +254,7 @@ const App = () => {
       </main>
 
       {/* Footer - only show on home view */}
-      {view === "home" && <Footer />}
+      {view === "home" && <Footer currentTheme={currentTheme} />}
     </div>
   );
 };

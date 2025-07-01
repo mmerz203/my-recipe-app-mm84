@@ -41,6 +41,8 @@ const SettingsIcon = ({ size = 20 }) => (
 );
 
 const SettingsPage = ({ onBack }) => {
+  // Status message state
+  const [status, setStatus] = useState({ type: '', message: '' });
   const { preferences, updatePreferences } = useContext(UserPreferencesContext);
   const [cookbookName, setCookbookName] = useState(
     preferences.cookbookName || "Winsome Designs",
@@ -48,16 +50,17 @@ const SettingsPage = ({ onBack }) => {
   const [displayName, setDisplayName] = useState(
     preferences.userName || "Chef",
   );
-  const [selectedTheme, setSelectedTheme] = useState("winsome");
+  const [selectedTheme, setSelectedTheme] = useState(preferences.theme || "winsome");
 
   // Debounce timeout ref
   const debounceTimeoutRef = useRef({});
 
-  // Sync with preferences
+  // Sync with preferences when user changes (not on every keystroke)
   useEffect(() => {
     setCookbookName(preferences.cookbookName || "Winsome Designs");
     setDisplayName(preferences.userName || "Chef");
-  }, [preferences.cookbookName, preferences.userName]);
+    setSelectedTheme(preferences.theme || "winsome");
+  }, [preferences.userName, preferences.cookbookName, preferences.theme]);
 
   // Debounce function
   const debounceUpdate = (key, value, delay = 500) => {
@@ -80,10 +83,17 @@ const SettingsPage = ({ onBack }) => {
   };
 
   const handleSaveChanges = () => {
-    updatePreferences({
-      cookbookName: cookbookName,
-      userName: displayName,
-    });
+    try {
+      updatePreferences({
+        cookbookName: cookbookName,
+        userName: displayName,
+        theme: selectedTheme,
+      });
+      setStatus({ type: 'success', message: 'Changes saved successfully!' });
+    } catch (err) {
+      setStatus({ type: 'error', message: 'Failed to save changes.' });
+    }
+    setTimeout(() => setStatus({ type: '', message: '' }), 2500);
   };
 
   const themes = [
@@ -96,43 +106,102 @@ const SettingsPage = ({ onBack }) => {
       selected: true,
     },
     {
-      id: "classic",
-      name: "Classic",
-      colors: ["rgb(107, 114, 128)", "rgb(75, 85, 99)", "rgb(55, 65, 81)"],
-      gradient:
-        "linear-gradient(135deg, rgb(249, 250, 251) 0%, rgba(107, 114, 128, 0.2) 50%, rgba(75, 85, 99, 0.2) 100%)",
+      id: "emerald",
+      name: "Emerald Glow",
+      colors: ["#225560", "#3ddc97", "#3d2b3d"],
+      gradient: "linear-gradient(135deg, #225560 0%, #3ddc97 50%, #3d2b3d 100%)",
       selected: false,
     },
     {
-      id: "nature",
-      name: "Nature",
-      colors: ["rgb(34, 197, 94)", "rgb(22, 163, 74)", "rgb(21, 128, 61)"],
-      gradient:
-        "linear-gradient(135deg, rgb(240, 253, 244) 0%, rgba(34, 197, 94, 0.2) 50%, rgba(22, 163, 74, 0.2) 100%)",
+      id: "rustic",
+      name: "Rustic Garden",
+      colors: ["#a57f60", "#f2e791", "#c880b7"],
+      gradient: "linear-gradient(135deg, #f2e791 0%, #a57f60 50%, #c880b7 100%)",
       selected: false,
     },
     {
-      id: "royal",
-      name: "Royal",
-      colors: ["rgb(99, 102, 241)", "rgb(79, 70, 229)", "rgb(67, 56, 202)"],
-      gradient:
-        "linear-gradient(135deg, rgb(238, 242, 255) 0%, rgba(99, 102, 241, 0.2) 50%, rgba(79, 70, 229, 0.2) 100%)",
+      id: "ocean",
+      name: "Ocean",
+      colors: ["#4F8EF7", "#235390", "#38B6FF"],
+      gradient: "linear-gradient(135deg, #E0F1FF 0%, #4F8EF7 50%, #235390 100%)",
       selected: false,
     },
   ];
 
+  // Theme palette for preview
+  const themePalettes = {
+    winsome: {
+      background: "rgb(246, 220, 198)",
+      primary: "rgb(252, 161, 126)",
+      secondary: "rgb(218, 98, 125)",
+      accent: "rgb(154, 52, 142)",
+      text: "rgb(16, 8, 43)",
+    },
+    emerald: {
+      background: "#225560",
+      primary: "#3ddc97",
+      secondary: "#3d2b3d",
+      accent: "#3ddc97",
+      text: "#f0fdfa",
+    },
+    rustic: {
+      background: "#f2e791",
+      primary: "#a57f60",
+      secondary: "#c880b7",
+      accent: "#a57f60",
+      text: "#3d2b1f",
+    },
+    ocean: {
+      background: "#E0F1FF",
+      primary: "#4F8EF7",
+      secondary: "#235390",
+      accent: "#38B6FF",
+      text: "#10243B",
+    },
+  };
+  const currentTheme = themePalettes[selectedTheme] || themePalettes["winsome"];
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "rgb(246, 220, 198)",
+        background: currentTheme.background,
         fontFamily: fontFamily,
         fontSize: "16px",
         fontWeight: "400",
         lineHeight: "24px",
-        color: "rgb(16, 8, 43)",
+        color: currentTheme.text,
       }}
     >
+      {/* Status Message */}
+      {status.message && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 24,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 1000,
+            background: status.type === 'success'
+              ? 'rgba(34,197,94,0.75)'
+              : 'rgba(218,98,125,0.75)',
+            color: 'white',
+            padding: '12px 32px',
+            borderRadius: '8px',
+            fontWeight: 600,
+            fontSize: '18px',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+            border: status.type === 'success'
+              ? '2px solid rgba(16,185,129,0.75)'
+              : '2px solid rgba(154,52,142,0.75)',
+            transition: 'opacity 0.3s',
+            opacity: status.message ? 1 : 0,
+            fontFamily: fontFamily,
+            backdropFilter: 'blur(2px)',
+          }}
+        >
+          {status.message}
+        </div>
+      )}
       {/* Header */}
       <header
         style={{
@@ -390,97 +459,99 @@ const SettingsPage = ({ onBack }) => {
                   gap: "16px",
                 }}
               >
-                {themes.map((theme) => (
-                  <div
-                    key={theme.id}
-                    onClick={() => setSelectedTheme(theme.id)}
-                    style={{
-                      width: "100%",
-                      height: "96px",
-                      borderRadius: "8px",
-                      border:
-                        theme.id === "winsome"
+                {themes.map((theme) => {
+                  const isSelected = selectedTheme === theme.id;
+                  return (
+                    <div
+                      key={theme.id}
+                      onClick={() => setSelectedTheme(theme.id)}
+                      style={{
+                        width: "100%",
+                        height: "96px",
+                        borderRadius: "8px",
+                        border: isSelected
                           ? "2px solid rgb(252, 161, 126)"
                           : "1px solid rgba(230, 202, 179, 0.3)",
-                      background: theme.gradient,
-                      padding: "12px",
-                      cursor: "pointer",
-                      position: "relative",
-                      transition: "border-color 0.2s ease",
-                      boxSizing: "border-box",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (theme.id !== "winsome") {
-                        e.target.style.borderColor = "rgba(230, 202, 179, 0.6)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (theme.id !== "winsome") {
-                        e.target.style.borderColor = "rgba(230, 202, 179, 0.3)";
-                      }
-                    }}
-                  >
-                    {/* Color Dots */}
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "4px",
-                        marginBottom: "8px",
+                        background: theme.gradient,
+                        padding: "12px",
+                        cursor: "pointer",
+                        position: "relative",
+                        transition: "border-color 0.2s ease",
+                        boxSizing: "border-box",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isSelected) {
+                          e.target.style.borderColor = "rgba(230, 202, 179, 0.6)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isSelected) {
+                          e.target.style.borderColor = "rgba(230, 202, 179, 0.3)";
+                        }
                       }}
                     >
-                      {theme.colors.map((color, index) => (
-                        <div
-                          key={index}
-                          style={{
-                            width: "8px",
-                            height: "8px",
-                            borderRadius: "50%",
-                            background: color,
-                          }}
-                        />
-                      ))}
-                    </div>
-
-                    {/* Theme Name */}
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: "500",
-                        color: "rgb(16, 8, 43)",
-                        fontFamily: fontFamily,
-                      }}
-                    >
-                      {theme.name}
-                    </div>
-
-                    {/* Selected Indicator */}
-                    {theme.id === "winsome" && (
+                      {/* Color Dots */}
                       <div
                         style={{
-                          position: "absolute",
-                          top: "-8px",
-                          right: "-8px",
-                          width: "24px",
-                          height: "24px",
-                          background: "rgb(252, 161, 126)",
-                          borderRadius: "50%",
                           display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
+                          gap: "4px",
+                          marginBottom: "8px",
                         }}
                       >
+                        {theme.colors.map((color, index) => (
+                          <div
+                            key={index}
+                            style={{
+                              width: "8px",
+                              height: "8px",
+                              borderRadius: "50%",
+                              background: color,
+                            }}
+                          />
+                        ))}
+                      </div>
+
+                      {/* Theme Name */}
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          fontWeight: "500",
+                          color: "rgb(16, 8, 43)",
+                          fontFamily: fontFamily,
+                        }}
+                      >
+                        {theme.name}
+                      </div>
+
+                      {/* Selected Indicator */}
+                      {isSelected && (
                         <div
                           style={{
-                            width: "12px",
-                            height: "12px",
-                            background: "rgb(16, 8, 43)",
+                            position: "absolute",
+                            top: "-8px",
+                            right: "-8px",
+                            width: "24px",
+                            height: "24px",
+                            background: "rgb(252, 161, 126)",
                             borderRadius: "50%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
                           }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                ))}
+                        >
+                          <div
+                            style={{
+                              width: "12px",
+                              height: "12px",
+                              background: "rgb(16, 8, 43)",
+                              borderRadius: "50%",
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

@@ -14,7 +14,8 @@ const HomeComponent = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
   const { preferences } = useContext(UserPreferencesContext);
   const { recipes } = useContext(RecipeContext) || { recipes: [] };
 
-  const userName = preferences.userName || "Guest";
+  // Use dynamic userName from preferences, fallback to "Chef" if not set
+  const userName = preferences.userName && preferences.userName.trim() !== "" ? preferences.userName : "Chef";
   const totalRecipes = recipes ? recipes.length : 0;
   const categories = Array.from(
     new Set((recipes || []).map((r) => r.category)),
@@ -32,8 +33,7 @@ const HomeComponent = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
       <section className="px-4 sm:px-6 lg:px-8 pt-12 pb-8">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-winsome-text-dark mb-6 animate-fade-in">
-            Welcome,{" "}
-            <span className="text-winsome-primary-brand">{userName}</span>!
+            Welcome, <span className="text-winsome-primary-brand">{userName}</span>!
           </h1>
           <p className="text-lg sm:text-xl text-winsome-text-dark/80 max-w-3xl mx-auto leading-relaxed">
             Your digital cookbook is ready to help you organize, create, and
