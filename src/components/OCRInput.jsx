@@ -31,10 +31,13 @@ const OCRInput = ({ onRecipeParsed }) => {
 
         const base64ImageData = image.split(',')[1];
 
-        // This is the corrected prompt string with proper backtick termination
+        // Updated prompt to include description, prepTime, cookTime
         const prompt = `Extract the recipe details from this image. Provide the output as a JSON object with the following structure:
 {
   "name": "Recipe Name",
+  "description": "Short description of the recipe (optional)",
+  "prepTime": "Preparation time (e.g., 15 min, 1 hour)",
+  "cookTime": "Cooking time (e.g., 30 min, 2 hours)",
   "servings": "Number of servings (e.g., 4, 6-8)",
   "ingredients": [
     "Ingredient 1",
@@ -45,7 +48,7 @@ const OCRInput = ({ onRecipeParsed }) => {
     "Step 2"
   ]
 }
-If a field is not found, use an empty string for "name" or "servings", and empty arrays for "ingredients" or "instructions".`;
+If a field is not found, use an empty string for any string field, and empty arrays for "ingredients" or "instructions".`;
 
         let chatHistory = [];
         chatHistory.push({ role: "user", parts: [{ text: prompt }] });
@@ -70,11 +73,14 @@ If a field is not found, use an empty string for "name" or "servings", and empty
                     type: "OBJECT",
                     properties: {
                         "name": { "type": "STRING" },
+                        "description": { "type": "STRING" },
+                        "prepTime": { "type": "STRING" },
+                        "cookTime": { "type": "STRING" },
                         "servings": { "type": "STRING" },
                         "ingredients": { "type": "ARRAY", "items": { "type": "STRING" } },
                         "instructions": { "type": "ARRAY", "items": { "type": "STRING" } }
                     },
-                    "propertyOrdering": ["name", "servings", "ingredients", "instructions"]
+                    "propertyOrdering": ["name", "description", "prepTime", "cookTime", "servings", "ingredients", "instructions"]
                 }
             }
         };

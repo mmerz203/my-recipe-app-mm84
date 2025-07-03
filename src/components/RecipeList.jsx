@@ -93,7 +93,7 @@ const FilterIcon = ({ size = 18 }) => (
   </svg>
 );
 
-const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
+const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome, currentTheme }) => {
   const { recipes, loading, error } = useContext(RecipeContext);
   const { userId } = useContext(AuthContext);
   const [searchTerm, setSearchTerm] = useState("");
@@ -109,12 +109,14 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
           )),
     ) || [];
 
+  console.log("RecipeList: currentTheme prop:", currentTheme);
+
   if (loading) {
     return (
       <div
         style={{
           minHeight: "100vh",
-          background: "rgb(246, 220, 198)",
+          background: "var(--color-background)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -131,7 +133,7 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
       <div
         style={{
           minHeight: "100vh",
-          background: "rgb(246, 220, 198)",
+          background: "var(--color-background)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -155,19 +157,19 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
     <div
       style={{
         minHeight: "100vh",
-        background: "rgb(246, 220, 198)",
+        background: "var(--color-background)",
         fontFamily: fontFamily,
         fontSize: "16px",
         fontWeight: "400",
         lineHeight: "24px",
-        color: "rgb(16, 8, 43)",
+        color: "var(--color-text)",
       }}
     >
       {/* Header - Exact Specifications */}
       <header
         style={{
-          background: "rgb(246, 220, 198)",
-          borderBottom: "1px solid rgba(230, 202, 179, 0.2)",
+          background: "var(--color-background)",
+          borderBottom: "1px solid var(--color-border)",
           padding: "24px 16px",
         }}
       >
@@ -209,14 +211,14 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
               style={{
                 width: "32px",
                 height: "32px",
-                background: "rgb(252, 161, 126)",
+                background: "var(--color-primary)",
                 borderRadius: "8px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <RecipeBookIcon size={20} color="rgb(16, 8, 43)" />
+              <RecipeBookIcon size={20} color="var(--color-text)" />
             </div>
 
             <h1
@@ -224,7 +226,7 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
                 fontSize: "20px",
                 fontWeight: "700",
                 margin: "0",
-                color: "rgb(16, 8, 43)",
+                color: "var(--color-text)",
                 fontFamily: fontFamily,
               }}
             >
@@ -236,8 +238,8 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
           <button
             onClick={onAddRecipe}
             style={{
-              background: "rgb(252, 161, 126)",
-              color: "rgb(16, 8, 43)",
+              background: "var(--color-primary)",
+              color: "var(--color-text)",
               fontWeight: "600",
               padding: "8px 16px",
               border: "none",
@@ -249,12 +251,14 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
               alignItems: "center",
               gap: "8px",
             }}
-            onMouseEnter={(e) =>
-              (e.target.style.backgroundColor = "rgba(252, 161, 126, 0.9)")
-            }
-            onMouseLeave={(e) =>
-              (e.target.style.backgroundColor = "rgb(252, 161, 126)")
-            }
+            onMouseEnter={e => {
+              e.target.style.backgroundColor = "var(--color-primary)";
+              e.target.style.opacity = 0.85;
+            }}
+            onMouseLeave={e => {
+              e.target.style.backgroundColor = "var(--color-primary)";
+              e.target.style.opacity = 1;
+            }}
           >
             <PlusIcon size={18} />
             Add Recipe
@@ -380,7 +384,7 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
               style={{
                 width: "96px",
                 height: "96px",
-                background: "rgba(252, 161, 126, 0.2)",
+                background: "rgba(252, 161, 126, 0.2)", // fallback for 20% alpha
                 borderRadius: "24px",
                 margin: "0 auto 24px",
                 display: "flex",
@@ -388,7 +392,7 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
                 justifyContent: "center",
               }}
             >
-              <RecipeBookIcon size={48} color="rgb(252, 161, 126)" />
+              <RecipeBookIcon size={48} color="var(--color-primary)" />
             </div>
 
             {/* Empty State Title */}
@@ -396,7 +400,7 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
               style={{
                 fontSize: "32px",
                 fontWeight: "600",
-                color: "rgb(16, 8, 43)",
+                color: "var(--color-text)",
                 marginBottom: "16px",
                 margin: "0 0 16px 0",
                 fontFamily: fontFamily,
@@ -408,7 +412,7 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
             {/* Empty State Description */}
             <p
               style={{
-                color: "rgba(16, 8, 43, 0.6)",
+                color: "var(--color-muted)",
                 fontSize: "16px",
                 marginBottom: "32px",
                 maxWidth: "448px",
@@ -428,8 +432,8 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
             <button
               onClick={onAddRecipe}
               style={{
-                background: "rgb(252, 161, 126)",
-                color: "rgb(16, 8, 43)",
+                background: "var(--color-primary)",
+                color: "var(--color-text)",
                 fontWeight: "600",
                 padding: "12px 24px",
                 borderRadius: "12px",
@@ -442,12 +446,14 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
                 fontFamily: fontFamily,
                 fontSize: "16px",
               }}
-              onMouseEnter={(e) =>
-                (e.target.style.backgroundColor = "rgba(252, 161, 126, 0.9)")
-              }
-              onMouseLeave={(e) =>
-                (e.target.style.backgroundColor = "rgb(252, 161, 126)")
-              }
+              onMouseEnter={e => {
+                e.target.style.backgroundColor = "var(--color-primary)";
+                e.target.style.opacity = 0.85;
+              }}
+              onMouseLeave={e => {
+                e.target.style.backgroundColor = "var(--color-primary)";
+                e.target.style.opacity = 1;
+              }}
             >
               <PlusIcon size={18} />
               {searchTerm ? "Add New Recipe" : "Add Your First Recipe"}
@@ -468,10 +474,10 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
                 key={recipe.id}
                 onClick={() => onSelectRecipe(recipe.id)}
                 style={{
-                  background: "rgba(255, 255, 255, 0.5)",
+                  background: "var(--color-card)",
                   backdropFilter: "blur(4px)",
                   borderRadius: "12px",
-                  border: "1px solid rgba(230, 202, 179, 0.2)",
+                  border: "1px solid var(--color-border)",
                   overflow: "hidden",
                   transition: "transform 0.2s ease, box-shadow 0.2s ease",
                   cursor: "pointer",
@@ -490,7 +496,7 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
                 <div
                   style={{
                     height: "200px",
-                    background: "rgba(252, 161, 126, 0.1)",
+                    background: "rgba(252, 161, 126, 0.1)", // fallback for 10% alpha
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -518,7 +524,7 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
                       fontSize: "18px",
                       fontWeight: "600",
                       marginBottom: "8px",
-                      color: "rgb(16, 8, 43)",
+                      color: "var(--color-text)",
                       margin: "0 0 8px 0",
                       fontFamily: fontFamily,
                     }}
@@ -528,7 +534,7 @@ const RecipeList = ({ onSelectRecipe, onAddRecipe, onBackToHome }) => {
                   <p
                     style={{
                       fontSize: "14px",
-                      color: "rgba(16, 8, 43, 0.6)",
+                      color: "var(--color-muted)",
                       margin: "0",
                       fontFamily: fontFamily,
                     }}

@@ -12,12 +12,22 @@ const Card = ({
   const hoverClasses = hover
     ? "hover:scale-105 hover:shadow-xl cursor-pointer"
     : "";
-  const blurClasses = blur ? "bg-white/80 backdrop-blur-sm" : "bg-white";
+  // Use theme card background and border
+  const blurClasses = blur
+    ? "backdrop-blur-sm"
+    : "";
+
+  const style = {
+    background: 'var(--color-card)',
+    border: '1px solid var(--color-border)',
+    borderRadius: '16px',
+    ...props.style,
+  };
 
   const classes = `${baseClasses} ${blurClasses} ${hoverClasses} ${className}`;
 
   return (
-    <div className={classes} {...props}>
+    <div className={classes} style={style} {...props}>
       {children}
     </div>
   );

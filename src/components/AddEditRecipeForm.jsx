@@ -1,3 +1,4 @@
+import OCRInput from "./OCRInput";
 // Add New Recipe Form Page - Complete Recreation for Winsome Designs
 import React, { useState, useEffect, useRef } from "react";
 
@@ -51,7 +52,9 @@ const LargePlusIcon = ({ size = 32 }) => (
   </svg>
 );
 
-const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel }) => {
+const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel, currentTheme }) => {
+  console.log("AddEditRecipeForm: currentTheme prop:", currentTheme);
+
   const [recipe, setRecipe] = useState(
     initialRecipe || {
       name: "",
@@ -66,6 +69,20 @@ const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel }) => {
       isPublic: false,
     },
   );
+
+  // Handler to update recipe fields from OCR (must be after setRecipe is defined)
+  const handleRecipeParsedFromOCR = (parsed) => {
+    setRecipe((prev) => ({
+      ...prev,
+      name: parsed.name || prev.name,
+      description: parsed.description || prev.description,
+      prepTime: parsed.prepTime || prev.prepTime,
+      cookTime: parsed.cookTime || prev.cookTime,
+      servings: parsed.servings || prev.servings,
+      ingredients: Array.isArray(parsed.ingredients) ? parsed.ingredients.join("\n") : prev.ingredients,
+      instructions: Array.isArray(parsed.instructions) ? parsed.instructions.join("\n") : prev.instructions,
+    }));
+  };
 
   const [errors, setErrors] = useState({});
   const [isDragging, setIsDragging] = useState(false);
@@ -162,12 +179,12 @@ const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel }) => {
     <div
       style={{
         minHeight: "100vh",
-        background: "rgb(246, 220, 198)",
+        background: "var(--color-background)",
         fontFamily: fontFamily,
         fontSize: "16px",
         fontWeight: "400",
         lineHeight: "24px",
-        color: "rgb(16, 8, 43)",
+        color: "var(--color-text)",
       }}
     >
       {/* Header Section - Exact Specifications */}
@@ -571,99 +588,8 @@ const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel }) => {
 
               <div style={{ padding: "0 24px 24px" }}>
                 {/* OCR Upload Section */}
-                <div
-                  style={{
-                    border: `2px dashed ${isDragging ? "rgb(154, 52, 142)" : "rgba(230, 202, 179, 0.4)"}`,
-                    borderRadius: "8px",
-                    padding: "32px",
-                    textAlign: "center",
-                    background: isDragging
-                      ? "rgba(154, 52, 142, 0.05)"
-                      : "transparent",
-                    transition: "all 0.2s ease",
-                    cursor: "pointer",
-                  }}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  {/* Purple Icon Circle */}
-                  <div
-                    style={{
-                      width: "64px",
-                      height: "64px",
-                      background: "rgba(154, 52, 142, 0.2)",
-                      borderRadius: "16px",
-                      margin: "0 auto 16px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <LargePlusIcon size={32} />
-                  </div>
-
-                  {/* Upload Text */}
-                  <h3
-                    style={{
-                      fontSize: "18px",
-                      fontWeight: "500",
-                      color: "rgb(16, 8, 43)",
-                      margin: "0 0 8px 0",
-                      fontFamily: fontFamily,
-                    }}
-                  >
-                    Upload Recipe Image
-                  </h3>
-
-                  <p
-                    style={{
-                      color: "rgba(16, 8, 43, 0.6)",
-                      marginBottom: "16px",
-                      margin: "0 0 16px 0",
-                      fontFamily: fontFamily,
-                      fontSize: "14px",
-                      lineHeight: "1.4",
-                    }}
-                  >
-                    Take a photo or upload an image of your recipe, and we'll
-                    extract the text for you.
-                  </p>
-
-                  {/* Upload Button */}
-                  <button
-                    type="button"
-                    style={{
-                      border: "1px solid rgba(154, 52, 142, 0.3)",
-                      color: "rgb(154, 52, 142)",
-                      background: "transparent",
-                      padding: "8px 16px",
-                      borderRadius: "6px",
-                      fontWeight: "500",
-                      cursor: "pointer",
-                      transition: "background-color 0.2s ease",
-                      fontFamily: fontFamily,
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.target.style.backgroundColor =
-                        "rgba(154, 52, 142, 0.1)")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.target.style.backgroundColor = "transparent")
-                    }
-                  >
-                    Choose File
-                  </button>
-
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(e.target.files)}
-                    style={{ display: "none" }}
-                  />
-                </div>
+                {/* OCR Upload Section (replaces previous image upload UI) */}
+                <OCRInput onRecipeParsed={handleRecipeParsedFromOCR} />
               </div>
             </div>
           </div>

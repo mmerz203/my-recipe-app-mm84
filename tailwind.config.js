@@ -5,6 +5,26 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Azure Sunset
+        'background-light-azure': '#f0f8ff',
+        'primary-azure': '#4682b4',
+        'secondary-azure': '#ff7f50',
+        'neutral-azure': '#2f4f4f',
+        'text-dark-azure': '#1a1a2e',
+
+        // Emerald Bloom
+        'background-emerald-light': '#f5f5f5',
+        'primary-emerald': '#3cb371',
+        'secondary-emerald': '#8a2be2',
+        'tertiary-emerald': '#4b0082',
+        'text-dark-emerald': '#191970',
+
+        // Golden Meadow
+        'background-golden-light': '#fffacd',
+        'primary-golden': '#ffd700',
+        'secondary-golden': '#b8860b',
+        'tertiary-golden': '#556b2f',
+        'text-dark-golden': '#36454F',
         winsome: {
           background: "#f6dcca", // Exact background from DOM: rgb(246, 220, 198)
           "primary-orange": "#fca17d", // Exact primary: rgb(252, 161, 126)

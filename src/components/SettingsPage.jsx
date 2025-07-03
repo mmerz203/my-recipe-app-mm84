@@ -1,6 +1,7 @@
 // Exact Winsome Designs Settings Page - Complete Implementation
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { UserPreferencesContext } from "../contexts/UserPreferencesContext";
+import { getThemeColors } from "../utils/themeSystem";
 
 // Exact font family from specifications
 const fontFamily =
@@ -42,7 +43,7 @@ const SettingsIcon = ({ size = 20 }) => (
 
 const SettingsPage = ({ onBack }) => {
   // Status message state
-  const [status, setStatus] = useState({ type: '', message: '' });
+  const [status, setStatus] = useState({ type: "", message: "" });
   const { preferences, updatePreferences } = useContext(UserPreferencesContext);
   const [cookbookName, setCookbookName] = useState(
     preferences.cookbookName || "Winsome Designs",
@@ -50,7 +51,9 @@ const SettingsPage = ({ onBack }) => {
   const [displayName, setDisplayName] = useState(
     preferences.userName || "Chef",
   );
-  const [selectedTheme, setSelectedTheme] = useState(preferences.theme || "winsome");
+  const [selectedTheme, setSelectedTheme] = useState(
+    preferences.theme || "winsome",
+  );
 
   // Debounce timeout ref
   const debounceTimeoutRef = useRef({});
@@ -89,114 +92,128 @@ const SettingsPage = ({ onBack }) => {
         userName: displayName,
         theme: selectedTheme,
       });
-      setStatus({ type: 'success', message: 'Changes saved successfully!' });
+      setStatus({ type: "success", message: "Changes saved successfully!" });
     } catch (err) {
-      setStatus({ type: 'error', message: 'Failed to save changes.' });
+      setStatus({ type: "error", message: "Failed to save changes." });
     }
-    setTimeout(() => setStatus({ type: '', message: '' }), 2500);
+    setTimeout(() => setStatus({ type: "", message: "" }), 2500);
   };
 
+  const themeRoles = [
+    "Background", "Primary", "Secondary", "Tertiary", "Text", "Muted", "Border", "Error"
+  ];
   const themes = [
     {
       id: "winsome",
       name: "Winsome",
-      colors: ["rgb(252, 161, 126)", "rgb(218, 98, 125)", "rgb(154, 52, 142)"],
+      palette: [
+        "#f6dcca", // background
+        "#fca17d", // primary-orange
+        "#da627d", // secondary-rose
+        "#9a348e", // tertiary-purple
+        "#10082b", // text-dark
+        "rgba(16, 8, 43, 0.7)", // text-muted
+        "rgba(230, 202, 179, 0.2)", // border-subtle
+        "#d36060", // error
+      ],
       gradient:
         "linear-gradient(135deg, rgb(246, 220, 198) 0%, rgba(252, 161, 126, 0.2) 50%, rgba(218, 98, 125, 0.2) 100%)",
       selected: true,
     },
     {
-      id: "emerald",
-      name: "Emerald Glow",
-      colors: ["#225560", "#3ddc97", "#3d2b3d"],
-      gradient: "linear-gradient(135deg, #225560 0%, #3ddc97 50%, #3d2b3d 100%)",
+      id: "azure-sunset",
+      name: "Azure Sunset",
+      palette: [
+        "#f0f8ff", // background
+        "#4682b4", // primary
+        "#ff7f50", // secondary
+        "#2f4f4f", // tertiary
+        "#1a1a2e", // text
+        "rgba(26, 26, 46, 0.7)", // muted
+        "rgba(70, 130, 180, 0.2)", // border
+        "#d36060", // error (fallback)
+      ],
+      gradient:
+        "linear-gradient(135deg, #f0f8ff 0%, #4682b4 50%, #ff7f50 100%)",
       selected: false,
     },
     {
-      id: "rustic",
-      name: "Rustic Garden",
-      colors: ["#a57f60", "#f2e791", "#c880b7"],
-      gradient: "linear-gradient(135deg, #f2e791 0%, #a57f60 50%, #c880b7 100%)",
+      id: "emerald-bloom",
+      name: "Emerald Bloom",
+      palette: [
+        "#f5f5f5", // background
+        "#3cb371", // primary
+        "#8a2be2", // secondary
+        "#4b0082", // tertiary
+        "#191970", // text
+        "rgba(25, 25, 112, 0.7)", // muted
+        "rgba(60, 179, 113, 0.2)", // border
+        "#d36060", // error (fallback)
+      ],
+      gradient:
+        "linear-gradient(135deg, #f5f5f5 0%, #3cb371 50%, #8a2be2 100%)",
       selected: false,
     },
     {
-      id: "ocean",
-      name: "Ocean",
-      colors: ["#4F8EF7", "#235390", "#38B6FF"],
-      gradient: "linear-gradient(135deg, #E0F1FF 0%, #4F8EF7 50%, #235390 100%)",
+      id: "golden-meadow",
+      name: "Golden Meadow",
+      palette: [
+        "#fffacd", // background
+        "#ffd700", // primary
+        "#b8860b", // secondary
+        "#556b2f", // tertiary
+        "#36454F", // text
+        "rgba(54, 69, 79, 0.7)", // muted
+        "rgba(255, 215, 0, 0.2)", // border
+        "#d36060", // error (fallback)
+      ],
+      gradient:
+        "linear-gradient(135deg, #fffacd 0%, #ffd700 50%, #b8860b 100%)",
       selected: false,
     },
   ];
 
-  // Theme palette for preview
-  const themePalettes = {
-    winsome: {
-      background: "rgb(246, 220, 198)",
-      primary: "rgb(252, 161, 126)",
-      secondary: "rgb(218, 98, 125)",
-      accent: "rgb(154, 52, 142)",
-      text: "rgb(16, 8, 43)",
-    },
-    emerald: {
-      background: "#225560",
-      primary: "#3ddc97",
-      secondary: "#3d2b3d",
-      accent: "#3ddc97",
-      text: "#f0fdfa",
-    },
-    rustic: {
-      background: "#f2e791",
-      primary: "#a57f60",
-      secondary: "#c880b7",
-      accent: "#a57f60",
-      text: "#3d2b1f",
-    },
-    ocean: {
-      background: "#E0F1FF",
-      primary: "#4F8EF7",
-      secondary: "#235390",
-      accent: "#38B6FF",
-      text: "#10243B",
-    },
-  };
-  const currentTheme = themePalettes[selectedTheme] || themePalettes["winsome"];
+  // Use centralized theme system
+  const currentTheme = getThemeColors({ theme: selectedTheme });
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: currentTheme.background,
+        background: "var(--color-background)",
         fontFamily: fontFamily,
         fontSize: "16px",
         fontWeight: "400",
         lineHeight: "24px",
-        color: currentTheme.text,
+        color: "var(--color-text)",
       }}
     >
       {/* Status Message */}
       {status.message && (
         <div
           style={{
-            position: 'fixed',
+            position: "fixed",
             top: 24,
-            left: '50%',
-            transform: 'translateX(-50%)',
+            left: "50%",
+            transform: "translateX(-50%)",
             zIndex: 1000,
-            background: status.type === 'success'
-              ? 'rgba(34,197,94,0.75)'
-              : 'rgba(218,98,125,0.75)',
-            color: 'white',
-            padding: '12px 32px',
-            borderRadius: '8px',
+            background:
+              status.type === "success"
+                ? "rgba(34,197,94,0.75)"
+                : "rgba(218,98,125,0.75)",
+            color: "white",
+            padding: "12px 32px",
+            borderRadius: "8px",
             fontWeight: 600,
-            fontSize: '18px',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-            border: status.type === 'success'
-              ? '2px solid rgba(16,185,129,0.75)'
-              : '2px solid rgba(154,52,142,0.75)',
-            transition: 'opacity 0.3s',
+            fontSize: "18px",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+            border:
+              status.type === "success"
+                ? "2px solid rgba(16,185,129,0.75)"
+                : "2px solid rgba(154,52,142,0.75)",
+            transition: "opacity 0.3s",
             opacity: status.message ? 1 : 0,
             fontFamily: fontFamily,
-            backdropFilter: 'blur(2px)',
+            backdropFilter: "blur(2px)",
           }}
         >
           {status.message}
@@ -205,7 +222,7 @@ const SettingsPage = ({ onBack }) => {
       {/* Header */}
       <header
         style={{
-          background: "rgb(246, 220, 198)",
+          background: "var(--color-background)",
           borderBottom: "1px solid rgba(230, 202, 179, 0.2)",
           padding: "24px 16px",
         }}
@@ -263,7 +280,7 @@ const SettingsPage = ({ onBack }) => {
                 fontSize: "20px",
                 fontWeight: "700",
                 margin: "0",
-                color: "rgb(16, 8, 43)",
+          color: "var(--color-text)",
                 fontFamily: fontFamily,
               }}
             >
@@ -275,8 +292,8 @@ const SettingsPage = ({ onBack }) => {
           <button
             onClick={handleSaveChanges}
             style={{
-              background: "rgb(154, 52, 142)",
-              color: "white",
+                background: "var(--color-accent)",
+                color: "var(--color-accent-text)",
               fontWeight: "600",
               padding: "8px 16px",
               border: "none",
@@ -286,10 +303,10 @@ const SettingsPage = ({ onBack }) => {
               fontFamily: fontFamily,
             }}
             onMouseEnter={(e) =>
-              (e.target.style.backgroundColor = "rgba(154, 52, 142, 0.9)")
+                (e.target.style.backgroundColor = "var(--color-accent-hover)")
             }
             onMouseLeave={(e) =>
-              (e.target.style.backgroundColor = "rgb(154, 52, 142)")
+                (e.target.style.backgroundColor = "var(--color-accent)")
             }
           >
             Save Changes
@@ -309,7 +326,7 @@ const SettingsPage = ({ onBack }) => {
           {/* Card 1: Personal Information */}
           <div
             style={{
-              background: "rgba(255, 255, 255, 0.5)",
+                background: "var(--color-card)",
               backdropFilter: "blur(4px)",
               border: "1px solid rgba(230, 202, 179, 0.2)",
               borderRadius: "12px",
@@ -321,7 +338,7 @@ const SettingsPage = ({ onBack }) => {
                   fontSize: "18px",
                   fontWeight: "600",
                   margin: "0",
-                  color: "rgb(16, 8, 43)",
+                color: "var(--color-text)",
                   fontFamily: fontFamily,
                 }}
               >
@@ -481,16 +498,18 @@ const SettingsPage = ({ onBack }) => {
                       }}
                       onMouseEnter={(e) => {
                         if (!isSelected) {
-                          e.target.style.borderColor = "rgba(230, 202, 179, 0.6)";
+                          e.target.style.borderColor =
+                            "rgba(230, 202, 179, 0.6)";
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (!isSelected) {
-                          e.target.style.borderColor = "rgba(230, 202, 179, 0.3)";
+                          e.target.style.borderColor =
+                            "rgba(230, 202, 179, 0.3)";
                         }
                       }}
                     >
-                      {/* Color Dots */}
+                      {/* Color Swatches for All Roles */}
                       <div
                         style={{
                           display: "flex",
@@ -498,19 +517,21 @@ const SettingsPage = ({ onBack }) => {
                           marginBottom: "8px",
                         }}
                       >
-                        {theme.colors.map((color, index) => (
+                        {theme.palette.map((color, index) => (
                           <div
                             key={index}
+                            title={themeRoles[index]}
                             style={{
-                              width: "8px",
-                              height: "8px",
-                              borderRadius: "50%",
+                              width: "16px",
+                              height: "16px",
+                              borderRadius: "4px",
                               background: color,
+                              border: "1px solid #eee",
+                              display: "inline-block",
                             }}
                           />
                         ))}
                       </div>
-
                       {/* Theme Name */}
                       <div
                         style={{
@@ -522,7 +543,6 @@ const SettingsPage = ({ onBack }) => {
                       >
                         {theme.name}
                       </div>
-
                       {/* Selected Indicator */}
                       {isSelected && (
                         <div

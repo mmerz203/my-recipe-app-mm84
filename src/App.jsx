@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "./contexts/AuthContext";
 import { RecipeContext } from "./contexts/RecipeContext";
 import { UserPreferencesContext } from "./contexts/UserPreferencesContext";
+import { getThemeColors } from "./utils/themeSystem";
 
 import LoadingSpinner from "./components/LoadingSpinner";
 import Header from "./components/Header";
@@ -12,6 +13,7 @@ import AddEditRecipeForm from "./components/AddEditRecipeForm";
 import RecipeDetail from "./components/RecipeDetail";
 import SettingsPage from "./components/SettingsPage";
 import Footer from "./components/Footer";
+import DuplicateRecipeModal from "./components/DuplicateRecipeModal";
 
 const App = () => {
   const { userId, authReady } = useContext(AuthContext);
@@ -29,6 +31,9 @@ const App = () => {
   const [selectedRecipeId, setSelectedRecipeId] = useState(null);
   const [recipeToEdit, setRecipeToEdit] = useState(null);
   const [appError, setAppError] = useState(null);
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
+  const [pendingRecipe, setPendingRecipe] = useState(null);
+  const [pendingAction, setPendingAction] = useState(null); // 'add' or 'edit'
 
   // Debugging log for preferences.userName (before return) - KEEP THIS ONE
   if (import.meta.env.DEV) {
@@ -59,6 +64,17 @@ const App = () => {
 
   const handleAddRecipe = async (newRecipe) => {
     setAppError(null);
+    // Case-insensitive duplicate check for current user's recipes
+    const duplicate = recipes.find(
+      (r) =>
+        r.name.trim().toLowerCase() === newRecipe.name.trim().toLowerCase(),
+    );
+    if (duplicate) {
+      setPendingRecipe(newRecipe);
+      setPendingAction("add");
+      setShowDuplicateModal(true);
+      return;
+    }
     try {
       await addRecipe(newRecipe);
       setView("viewRecipes");
@@ -70,6 +86,19 @@ const App = () => {
   const handleUpdateRecipe = async (updatedRecipeData) => {
     setAppError(null);
     if (selectedRecipeId) {
+      // Case-insensitive duplicate check, excluding the current recipe
+      const duplicate = recipes.find(
+        (r) =>
+          r.id !== selectedRecipeId &&
+          r.name.trim().toLowerCase() ===
+            updatedRecipeData.name.trim().toLowerCase(),
+      );
+      if (duplicate) {
+        setPendingRecipe(updatedRecipeData);
+        setPendingAction("edit");
+        setShowDuplicateModal(true);
+        return;
+      }
       try {
         await updateRecipe(
           selectedRecipeId,
@@ -84,6 +113,60 @@ const App = () => {
       }
     }
   };
+  // Duplicate Modal Handlers
+  const handleDuplicateRename = () => {
+    setShowDuplicateModal(false);
+    // Let user edit the name in the form (do not save yet)
+    // The AddEditRecipeForm will still have the pendingRecipe as its state
+  };
+
+  const handleDuplicateOverwrite = async () => {
+    setShowDuplicateModal(false);
+    if (!pendingRecipe) return;
+    if (pendingAction === "add") {
+      // Overwrite: delete the old recipe, then add the new one
+      const duplicate = recipes.find(
+        (r) =>
+          r.name.trim().toLowerCase() ===
+          pendingRecipe.name.trim().toLowerCase(),
+      );
+      if (duplicate) {
+        // Remove the duplicate, then add
+        try {
+          await updateRecipe(
+            duplicate.id,
+            pendingRecipe,
+            pendingRecipe.isPublic,
+          );
+          setView("viewRecipes");
+        } catch (e) {
+          setAppError("Failed to overwrite existing recipe.");
+        }
+      }
+    } else if (pendingAction === "edit" && selectedRecipeId) {
+      // Overwrite: update the current recipe (already in edit mode)
+      try {
+        await updateRecipe(
+          selectedRecipeId,
+          pendingRecipe,
+          pendingRecipe.isPublic,
+        );
+        setRecipeToEdit(null);
+        setSelectedRecipeId(null);
+        setView("viewRecipes");
+      } catch (e) {
+        setAppError("Failed to overwrite existing recipe.");
+      }
+    }
+    setPendingRecipe(null);
+    setPendingAction(null);
+  };
+
+  const handleDuplicateCancel = () => {
+    setShowDuplicateModal(false);
+    setPendingRecipe(null);
+    setPendingAction(null);
+  };
 
   const handleCancelForm = () => {
     setView("viewRecipes");
@@ -92,24 +175,36 @@ const App = () => {
     setAppError(null);
   };
 
+
+  // Use centralized theme system
+  const currentTheme = getThemeColors(preferences);
+  // Set CSS variables globally for the current theme
+  useEffect(() => {
+    // setThemeCSSVariables will set all --color-* variables on :root
+    // This ensures global theming for all components
+    if (currentTheme) {
+      // Dynamically import to avoid circular dependency if any
+      import("./utils/themeSystem").then(({ setThemeCSSVariables }) => {
+        setThemeCSSVariables(currentTheme);
+      });
+    }
+  }, [currentTheme]);
+  const backgroundStyle = {
+    minHeight: "100vh",
+    background: "var(--color-background)",
+    fontFamily: "Inter, system-ui, -apple-system, sans-serif",
+    color: "var(--color-text)",
+  };
+
   if (!authReady || loadingPreferences) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "rgb(246, 220, 198)",
-          fontFamily: "Inter, system-ui, -apple-system, sans-serif",
-        }}
-      >
-        <div style={{ textAlign: "center" }}>
+      <div style={backgroundStyle}>
+        <div style={{ textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
           <LoadingSpinner />
           <p
             style={{
               marginTop: "16px",
-              color: "rgb(16, 8, 43)",
+              color: "var(--color-text)",
               fontSize: "18px",
               fontWeight: "500",
             }}
@@ -125,57 +220,15 @@ const App = () => {
     ? recipes.find((r) => r.id === selectedRecipeId)
     : null;
 
-  // --- THEME PALETTE SUPPORT ---
-  // Define palettes for all themes
-  const themePalettes = {
-    winsome: {
-      background: "rgb(246, 220, 198)",
-      primary: "rgb(252, 161, 126)",
-      secondary: "rgb(218, 98, 125)",
-      accent: "rgb(154, 52, 142)",
-      text: "rgb(16, 8, 43)",
-    },
-    emerald: {
-      background: "#225560",
-      primary: "#3ddc97",
-      secondary: "#3d2b3d",
-      accent: "#3ddc97",
-      text: "#f0fdfa",
-    },
-    rustic: {
-      background: "#f2e791",
-      primary: "#a57f60",
-      secondary: "#c880b7",
-      accent: "#a57f60",
-      text: "#3d2b1f",
-    },
-    ocean: {
-      background: "#E0F1FF",
-      primary: "#4F8EF7",
-      secondary: "#235390",
-      accent: "#38B6FF",
-      text: "#10243B",
-    },
-  };
-
-
-  // Use preferences.theme.id if available, else fallback to string or 'winsome'
-  const themeKey = preferences.theme && typeof preferences.theme === 'object' && preferences.theme.id
-    ? preferences.theme.id
-    : (typeof preferences.theme === 'string' ? preferences.theme : 'winsome');
-  const currentTheme = themePalettes[themeKey] || themePalettes["winsome"];
-  // Remove debug logging after confirming fix
-  const backgroundStyle = {
-    minHeight: "100vh",
-    background: currentTheme.background,
-    fontFamily: "Inter, system-ui, -apple-system, sans-serif",
-    color: currentTheme.text,
-  };
-
   return (
     <div style={backgroundStyle}>
       {/* Header - only show on non-home views */}
-      {view !== "home" && <Header onSettings={() => setView("settings")} currentTheme={currentTheme} />}
+      {view !== "home" && (
+        <Header
+          onSettings={() => setView("settings")}
+          currentTheme={currentTheme}
+        />
+      )}
 
       {/* Global Error Display */}
       {appError && (
@@ -209,11 +262,20 @@ const App = () => {
 
       {/* Main Content */}
       <main className="min-h-screen">
+        {/* Duplicate Recipe Modal */}
+        <DuplicateRecipeModal
+          show={showDuplicateModal}
+          recipeName={pendingRecipe?.name || ""}
+          onClose={handleDuplicateCancel}
+          onRename={handleDuplicateRename}
+          onOverwrite={handleDuplicateOverwrite}
+        />
         {view === "home" && (
           <ExactHomepage
             onAddRecipe={() => setView("addRecipe")}
             onViewAllRecipes={() => setView("viewRecipes")}
             onCustomize={() => setView("settings")}
+            currentTheme={currentTheme}
           />
         )}
         {view === "viewRecipes" && (
@@ -221,6 +283,7 @@ const App = () => {
             onSelectRecipe={handleSelectRecipe}
             onAddRecipe={() => setView("addRecipe")}
             onBackToHome={() => setView("home")}
+            currentTheme={currentTheme}
           />
         )}
         {view === "addRecipe" && (
@@ -228,6 +291,7 @@ const App = () => {
             initialRecipe={null}
             onSave={handleAddRecipe}
             onCancel={() => setView("viewRecipes")}
+            currentTheme={currentTheme}
           />
         )}
         {view === "viewDetail" && currentRecipe && (
@@ -241,6 +305,7 @@ const App = () => {
               setView("editRecipe");
               setRecipeToEdit(currentRecipe);
             }}
+            currentTheme={currentTheme}
           />
         )}
         {view === "editRecipe" && recipeToEdit && (
@@ -248,13 +313,13 @@ const App = () => {
             initialRecipe={recipeToEdit}
             onSave={handleUpdateRecipe}
             onCancel={() => setView("viewRecipes")}
+            currentTheme={currentTheme}
           />
         )}
-        {view === "settings" && <SettingsPage onBack={() => setView("home")} />}
+        {view === "settings" && <SettingsPage onBack={() => setView("home")} currentTheme={currentTheme} />}
       </main>
 
-      {/* Footer - only show on home view */}
-      {view === "home" && <Footer currentTheme={currentTheme} />}
+      {/* Footer is rendered by ExactHomepage on home view; removed from here to prevent duplicate footers */}
     </div>
   );
 };
