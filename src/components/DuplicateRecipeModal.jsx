@@ -11,12 +11,12 @@ const DuplicateRecipeModal = ({
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-winsome-text-dark bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-winsome-background p-6 rounded-lg shadow-xl max-w-md w-full mx-4 border border-winsome-border-subtle">
-        <h3 className="text-lg font-bold mb-4 text-winsome-text-dark">
+    <div className="fixed inset-0 bg-text-dark/75 flex items-center justify-center z-50 backdrop-blur-sm">
+      <div className="bg-card p-8 rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-border-theme animate-scale-in">
+        <h3 className="text-xl font-bold mb-4 text-text-dark font-sans">
           Duplicate Recipe Name
         </h3>
-        <p className="mb-6 text-winsome-text-dark">
+        <p className="mb-6 text-text-dark font-sans">
           A recipe named <strong>{recipeName}</strong> already exists. What
           would you like to do?
         </p>

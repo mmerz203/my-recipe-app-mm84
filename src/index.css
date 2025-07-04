@@ -19,6 +19,14 @@
   --color-border: rgba(230, 202, 179, 0.2);
   --color-card: #fff;
   --color-error: #d36060;
+
+  /* RGB values for button variants */
+  --color-primary-rgb: 252, 161, 126;
+  --color-secondary-rgb: 218, 98, 125;
+  --color-accent-rgb: 154, 52, 142;
+  --color-error-rgb: 211, 96, 96;
+  --color-text-rgb: 16, 8, 43;
+  --color-card-rgb: 255, 255, 255;
 }
 
 html,
@@ -53,25 +61,30 @@ body {
 }
 
 /* Card backgrounds */
-.card, .Card, .card-bg, .card-background {
+.card,
+.Card,
+.card-bg,
+.card-background {
   background: var(--color-card, #fff);
-  border: 1px solid var(--color-border, rgba(230,202,179,0.2));
+  border: 1px solid var(--color-border, rgba(230, 202, 179, 0.2));
   border-radius: 12px;
 }
 
 /* Muted text */
-.text-muted, .muted {
-  color: var(--color-muted, rgba(16,8,43,0.7));
+.text-muted,
+.muted {
+  color: var(--color-muted, rgba(16, 8, 43, 0.7));
 }
 
 /* Error text */
-.text-error, .error {
+.text-error,
+.error {
   color: var(--color-error, #d36060);
 }
 
 /* Border utility */
 .border-theme {
-  border-color: var(--color-border, rgba(230,202,179,0.2));
+  border-color: var(--color-border, rgba(230, 202, 179, 0.2));
 }
 
 /* Styles for the #root div where your React app mounts */
@@ -89,7 +102,10 @@ footer {
   padding-bottom: 20px; /* Space below footer content */
   color: var(--color-muted, #6b7280); /* Themed text color */
   font-size: 0.9em; /* Font size */
-  background-color: var(--color-background, transparent) !important; /* Themed footer background */
+  background-color: var(
+    --color-background,
+    transparent
+  ) !important; /* Themed footer background */
   flex-shrink: 0; /* Prevent footer from shrinking if content is too large */
   /* Optionally, add backdrop-blur or bg-opacity if you want a subtle effect */
 }
@@ -135,7 +151,6 @@ footer {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-
 
 .line-clamp-3 {
   display: -webkit-box;
@@ -201,4 +216,18 @@ img {
   .backdrop-blur-sm {
     backdrop-filter: blur(10px);
   }
+}
+
+/* Dynamic button hover effects */
+button:hover .button-gradient-overlay {
+  opacity: 1 !important;
+}
+
+/* Enhanced focus styles for theme-aware buttons */
+button:focus {
+  outline: none;
+}
+
+button:focus-visible {
+  outline: none;
 }

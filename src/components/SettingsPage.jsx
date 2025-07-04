@@ -2,10 +2,9 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { UserPreferencesContext } from "../contexts/UserPreferencesContext";
 import { getThemeColors } from "../utils/themeSystem";
+import Button from "./ui/Button";
 
-// Exact font family from specifications
-const fontFamily =
-  'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
+// Font family now handled by Tailwind classes
 
 // Back Arrow Icon
 const BackIcon = ({ size = 18 }) => (
@@ -100,7 +99,14 @@ const SettingsPage = ({ onBack }) => {
   };
 
   const themeRoles = [
-    "Background", "Primary", "Secondary", "Tertiary", "Text", "Muted", "Border", "Error"
+    "Background",
+    "Primary",
+    "Secondary",
+    "Tertiary",
+    "Text",
+    "Muted",
+    "Border",
+    "Error",
   ];
   const themes = [
     {
@@ -176,268 +182,79 @@ const SettingsPage = ({ onBack }) => {
   // Use centralized theme system
   const currentTheme = getThemeColors({ theme: selectedTheme });
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "var(--color-background)",
-        fontFamily: fontFamily,
-        fontSize: "16px",
-        fontWeight: "400",
-        lineHeight: "24px",
-        color: "var(--color-text)",
-      }}
-    >
+    <div className="min-h-screen bg-background text-text-dark font-sans text-base font-normal leading-6">
       {/* Status Message */}
       {status.message && (
         <div
-          style={{
-            position: "fixed",
-            top: 24,
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 1000,
-            background:
-              status.type === "success"
-                ? "rgba(34,197,94,0.75)"
-                : "rgba(218,98,125,0.75)",
-            color: "white",
-            padding: "12px 32px",
-            borderRadius: "8px",
-            fontWeight: 600,
-            fontSize: "18px",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
-            border:
-              status.type === "success"
-                ? "2px solid rgba(16,185,129,0.75)"
-                : "2px solid rgba(154,52,142,0.75)",
-            transition: "opacity 0.3s",
-            opacity: status.message ? 1 : 0,
-            fontFamily: fontFamily,
-            backdropFilter: "blur(2px)",
-          }}
+          className={`fixed top-6 left-1/2 -translate-x-1/2 z-[1000] px-8 py-3 rounded-lg font-semibold text-lg shadow-lg backdrop-blur-sm transition-opacity ${status.type === "success" ? "bg-green-500/75 border-2 border-green-400/75" : "bg-secondary-rose/75 border-2 border-tertiary-purple/75"} text-white`}
+          style={{ opacity: status.message ? 1 : 0 }}
         >
           {status.message}
         </div>
       )}
       {/* Header */}
-      <header
-        style={{
-          background: "var(--color-background)",
-          borderBottom: "1px solid rgba(230, 202, 179, 0.2)",
-          padding: "24px 16px",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1024px",
-            margin: "auto",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+      <header className="bg-background border-b border-neutral-subtle py-6 px-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
           {/* Left Side */}
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <button
-              onClick={onBack}
-              style={{
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                padding: "8px",
-                borderRadius: "6px",
-                transition: "background-color 0.2s ease",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              onMouseEnter={(e) =>
-                (e.target.style.backgroundColor = "rgba(252, 161, 126, 0.1)")
-              }
-              onMouseLeave={(e) =>
-                (e.target.style.backgroundColor = "transparent")
-              }
-            >
+          <div className="flex items-center gap-3">
+            <Button onClick={onBack} variant="ghost" size="md" className="p-3">
               <BackIcon size={18} />
-            </button>
-
-            <div
-              style={{
-                width: "32px",
-                height: "32px",
-                background: "rgb(154, 52, 142)",
-                borderRadius: "8px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
+            </Button>
+            <div className="w-8 h-8 bg-tertiary-purple rounded-lg flex items-center justify-center">
               <SettingsIcon size={20} />
             </div>
-
-            <h1
-              style={{
-                fontSize: "20px",
-                fontWeight: "700",
-                margin: "0",
-          color: "var(--color-text)",
-                fontFamily: fontFamily,
-              }}
-            >
+            <h1 className="text-xl font-bold m-0 text-text-dark font-sans">
               Settings
             </h1>
           </div>
 
           {/* Right Side */}
-          <button
-            onClick={handleSaveChanges}
-            style={{
-                background: "var(--color-accent)",
-                color: "var(--color-accent-text)",
-              fontWeight: "600",
-              padding: "8px 16px",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              transition: "background-color 0.2s ease",
-              fontFamily: fontFamily,
-            }}
-            onMouseEnter={(e) =>
-                (e.target.style.backgroundColor = "var(--color-accent-hover)")
-            }
-            onMouseLeave={(e) =>
-                (e.target.style.backgroundColor = "var(--color-accent)")
-            }
-          >
+          <Button onClick={handleSaveChanges} variant="primary" size="md">
             Save Changes
-          </button>
+          </Button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main
-        style={{
-          maxWidth: "1024px",
-          margin: "auto",
-          padding: "32px 16px",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+      <main className="max-w-4xl mx-auto py-8 px-4">
+        <div className="flex flex-col gap-8">
           {/* Card 1: Personal Information */}
-          <div
-            style={{
-                background: "var(--color-card)",
-              backdropFilter: "blur(4px)",
-              border: "1px solid rgba(230, 202, 179, 0.2)",
-              borderRadius: "12px",
-            }}
-          >
-            <div style={{ padding: "24px 24px 0" }}>
-              <h2
-                style={{
-                  fontSize: "18px",
-                  fontWeight: "600",
-                  margin: "0",
-                color: "var(--color-text)",
-                  fontFamily: fontFamily,
-                }}
-              >
+          <div className="bg-card backdrop-blur-sm border border-neutral-subtle rounded-xl">
+            <div className="pt-6 px-6 pb-0">
+              <h2 className="text-lg font-semibold m-0 text-text-dark font-sans">
                 Personal Information
               </h2>
             </div>
-
-            <div style={{ padding: "0 24px 24px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "24px",
-                }}
-              >
+            <div className="px-6 pb-6">
+              <div className="flex flex-col gap-6">
                 {/* Cookbook Name */}
                 <div>
-                  <label
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      color: "rgb(16, 8, 43)",
-                      marginBottom: "8px",
-                      display: "block",
-                      fontFamily: fontFamily,
-                    }}
-                  >
+                  <label className="text-sm font-medium text-text-dark mb-2 block font-sans">
                     Cookbook Name
                   </label>
                   <input
                     type="text"
                     value={cookbookName}
                     onChange={handleCookbookNameChange}
-                    style={{
-                      width: "100%",
-                      background: "rgba(255, 255, 255, 0.5)",
-                      border: "1px solid rgba(230, 202, 179, 0.3)",
-                      borderRadius: "6px",
-                      padding: "8px 12px",
-                      fontSize: "14px",
-                      color: "rgb(16, 8, 43)",
-                      fontFamily: fontFamily,
-                      outline: "none",
-                      boxSizing: "border-box",
-                    }}
+                    className="w-full bg-white/50 border border-neutral-subtle rounded-md px-3 py-2 text-sm text-text-dark font-sans outline-none box-border"
                   />
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      color: "rgba(16, 8, 43, 0.6)",
-                      marginTop: "4px",
-                      margin: "4px 0 0 0",
-                      fontFamily: fontFamily,
-                    }}
-                  >
+                  <p className="text-xs text-text-dark/60 mt-1 font-sans">
                     This appears in your cookbook header and footer
                   </p>
                 </div>
 
                 {/* Display Name */}
                 <div>
-                  <label
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      color: "rgb(16, 8, 43)",
-                      marginBottom: "8px",
-                      display: "block",
-                      fontFamily: fontFamily,
-                    }}
-                  >
+                  <label className="text-sm font-medium text-text-dark mb-2 block font-sans">
                     Display Name
                   </label>
                   <input
                     type="text"
                     value={displayName}
                     onChange={handleDisplayNameChange}
-                    style={{
-                      width: "100%",
-                      background: "rgba(255, 255, 255, 0.5)",
-                      border: "1px solid rgba(230, 202, 179, 0.3)",
-                      borderRadius: "6px",
-                      padding: "8px 12px",
-                      fontSize: "14px",
-                      color: "rgb(16, 8, 43)",
-                      fontFamily: fontFamily,
-                      outline: "none",
-                      boxSizing: "border-box",
-                    }}
+                    className="w-full bg-white/50 border border-neutral-subtle rounded-md px-3 py-2 text-sm text-text-dark font-sans outline-none box-border"
                   />
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      color: "rgba(16, 8, 43, 0.6)",
-                      marginTop: "4px",
-                      margin: "4px 0 0 0",
-                      fontFamily: fontFamily,
-                    }}
-                  >
+                  <p className="text-xs text-text-dark/60 mt-1 font-sans">
                     How you'd like to be greeted on the homepage
                   </p>
                 </div>
@@ -446,127 +263,42 @@ const SettingsPage = ({ onBack }) => {
           </div>
 
           {/* Card 2: Theme Selection */}
-          <div
-            style={{
-              background: "rgba(255, 255, 255, 0.5)",
-              backdropFilter: "blur(4px)",
-              border: "1px solid rgba(230, 202, 179, 0.2)",
-              borderRadius: "12px",
-            }}
-          >
-            <div style={{ padding: "24px 24px 0" }}>
-              <h2
-                style={{
-                  fontSize: "18px",
-                  fontWeight: "600",
-                  margin: "0",
-                  color: "rgb(16, 8, 43)",
-                  fontFamily: fontFamily,
-                }}
-              >
+          <div className="bg-white/50 backdrop-blur-sm border border-neutral-subtle rounded-xl">
+            <div className="pt-6 px-6 pb-0">
+              <h2 className="text-lg font-semibold m-0 text-text-dark font-sans">
                 Theme Selection
               </h2>
             </div>
-
-            <div style={{ padding: "0 24px 24px" }}>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
-                  gap: "16px",
-                }}
-              >
+            <div className="px-6 pb-6">
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-4">
                 {themes.map((theme) => {
                   const isSelected = selectedTheme === theme.id;
                   return (
                     <div
                       key={theme.id}
                       onClick={() => setSelectedTheme(theme.id)}
-                      style={{
-                        width: "100%",
-                        height: "96px",
-                        borderRadius: "8px",
-                        border: isSelected
-                          ? "2px solid rgb(252, 161, 126)"
-                          : "1px solid rgba(230, 202, 179, 0.3)",
-                        background: theme.gradient,
-                        padding: "12px",
-                        cursor: "pointer",
-                        position: "relative",
-                        transition: "border-color 0.2s ease",
-                        boxSizing: "border-box",
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isSelected) {
-                          e.target.style.borderColor =
-                            "rgba(230, 202, 179, 0.6)";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isSelected) {
-                          e.target.style.borderColor =
-                            "rgba(230, 202, 179, 0.3)";
-                        }
-                      }}
+                      className={`w-full h-24 rounded-lg p-3 cursor-pointer relative transition-colors box-border flex flex-col justify-between ${isSelected ? "border-2 border-primary-brand" : "border border-neutral-subtle"}`}
+                      style={{ background: theme.gradient }}
                     >
                       {/* Color Swatches for All Roles */}
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "4px",
-                          marginBottom: "8px",
-                        }}
-                      >
+                      <div className="flex gap-1 mb-2">
                         {theme.palette.map((color, index) => (
                           <div
                             key={index}
                             title={themeRoles[index]}
-                            style={{
-                              width: "16px",
-                              height: "16px",
-                              borderRadius: "4px",
-                              background: color,
-                              border: "1px solid #eee",
-                              display: "inline-block",
-                            }}
+                            className="w-4 h-4 rounded bg-white inline-block border border-gray-200"
+                            style={{ background: color }}
                           />
                         ))}
                       </div>
                       {/* Theme Name */}
-                      <div
-                        style={{
-                          fontSize: "12px",
-                          fontWeight: "500",
-                          color: "rgb(16, 8, 43)",
-                          fontFamily: fontFamily,
-                        }}
-                      >
+                      <div className="text-xs font-medium text-text-dark font-sans">
                         {theme.name}
                       </div>
                       {/* Selected Indicator */}
                       {isSelected && (
-                        <div
-                          style={{
-                            position: "absolute",
-                            top: "-8px",
-                            right: "-8px",
-                            width: "24px",
-                            height: "24px",
-                            background: "rgb(252, 161, 126)",
-                            borderRadius: "50%",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <div
-                            style={{
-                              width: "12px",
-                              height: "12px",
-                              background: "rgb(16, 8, 43)",
-                              borderRadius: "50%",
-                            }}
-                          />
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary-brand rounded-full flex items-center justify-center">
+                          <div className="w-3 h-3 bg-text-dark rounded-full" />
                         </div>
                       )}
                     </div>
@@ -577,169 +309,72 @@ const SettingsPage = ({ onBack }) => {
           </div>
 
           {/* Card 3: App Preferences */}
-          <div
-            style={{
-              background: "rgba(255, 255, 255, 0.5)",
-              backdropFilter: "blur(4px)",
-              border: "1px solid rgba(230, 202, 179, 0.2)",
-              borderRadius: "12px",
-            }}
-          >
-            <div style={{ padding: "24px 24px 0" }}>
-              <h2
-                style={{
-                  fontSize: "18px",
-                  fontWeight: "600",
-                  margin: "0",
-                  color: "rgb(16, 8, 43)",
-                  fontFamily: fontFamily,
-                }}
-              >
+          <div className="bg-white/50 backdrop-blur-sm border border-neutral-subtle rounded-xl">
+            <div className="pt-6 px-6 pb-0">
+              <h2 className="text-lg font-semibold m-0 text-text-dark font-sans">
                 App Preferences
               </h2>
             </div>
-
-            <div style={{ padding: "0 24px 24px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "16px",
-                }}
-              >
+            <div className="px-6 pb-6">
+              <div className="flex flex-col gap-4">
                 {/* Auto-save */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
+                <div className="flex items-center justify-between">
                   <div>
-                    <div
-                      style={{
-                        fontWeight: "500",
-                        color: "rgb(16, 8, 43)",
-                        fontFamily: fontFamily,
-                      }}
-                    >
+                    <div className="font-medium text-text-dark font-sans">
                       Auto-save Changes
                     </div>
-                    <div
-                      style={{
-                        fontSize: "14px",
-                        color: "rgba(16, 8, 43, 0.6)",
-                        fontFamily: fontFamily,
-                      }}
-                    >
+                    <div className="text-sm text-text-dark/60 font-sans">
                       Automatically save your preferences
                     </div>
                   </div>
-                  <button
-                    style={{
-                      border: "1px solid rgba(230, 202, 179, 0.3)",
-                      borderRadius: "4px",
-                      padding: "4px 8px",
-                      fontSize: "12px",
-                      opacity: "0.5",
-                      cursor: "not-allowed",
-                      background: "transparent",
-                      color: "rgb(16, 8, 43)",
-                      fontFamily: fontFamily,
-                    }}
+                  <Button
+                    variant="ghost"
+                    size="xs"
+                    disabled
+                    className="opacity-50"
                   >
                     Enabled
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Dark Mode */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
+                <div className="flex items-center justify-between">
                   <div>
-                    <div
-                      style={{
-                        fontWeight: "500",
-                        color: "rgb(16, 8, 43)",
-                        fontFamily: fontFamily,
-                      }}
-                    >
+                    <div className="font-medium text-text-dark font-sans">
                       Dark Mode
                     </div>
-                    <div
-                      style={{
-                        fontSize: "14px",
-                        color: "rgba(16, 8, 43, 0.6)",
-                        fontFamily: fontFamily,
-                      }}
-                    >
+                    <div className="text-sm text-text-dark/60 font-sans">
                       Switch to dark theme
                     </div>
                   </div>
-                  <button
-                    style={{
-                      border: "1px solid rgba(230, 202, 179, 0.3)",
-                      borderRadius: "4px",
-                      padding: "4px 8px",
-                      fontSize: "12px",
-                      opacity: "0.5",
-                      cursor: "not-allowed",
-                      background: "transparent",
-                      color: "rgb(16, 8, 43)",
-                      fontFamily: fontFamily,
-                    }}
+                  <Button
+                    variant="ghost"
+                    size="xs"
+                    disabled
+                    className="opacity-50"
                   >
                     Coming Soon
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Export Data */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
+                <div className="flex items-center justify-between">
                   <div>
-                    <div
-                      style={{
-                        fontWeight: "500",
-                        color: "rgb(16, 8, 43)",
-                        fontFamily: fontFamily,
-                      }}
-                    >
+                    <div className="font-medium text-text-dark font-sans">
                       Export Recipes
                     </div>
-                    <div
-                      style={{
-                        fontSize: "14px",
-                        color: "rgba(16, 8, 43, 0.6)",
-                        fontFamily: fontFamily,
-                      }}
-                    >
+                    <div className="text-sm text-text-dark/60 font-sans">
                       Download your recipes as PDF
                     </div>
                   </div>
-                  <button
-                    style={{
-                      border: "1px solid rgba(230, 202, 179, 0.3)",
-                      borderRadius: "4px",
-                      padding: "4px 8px",
-                      fontSize: "12px",
-                      opacity: "0.5",
-                      cursor: "not-allowed",
-                      background: "transparent",
-                      color: "rgb(16, 8, 43)",
-                      fontFamily: fontFamily,
-                    }}
+                  <Button
+                    variant="ghost"
+                    size="xs"
+                    disabled
+                    className="opacity-50"
                   >
                     Coming Soon
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

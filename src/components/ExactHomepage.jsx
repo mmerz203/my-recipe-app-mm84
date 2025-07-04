@@ -6,6 +6,7 @@ import {
   withAlpha,
   setThemeCSSVariables,
 } from "../utils/themeSystem";
+import Button from "./ui/Button";
 
 // Exact font family from specifications
 const fontFamily =
@@ -370,41 +371,16 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
             </p>
 
             {/* Action Button */}
-            <button
+            <Button
               onClick={onViewAllRecipes}
+              variant="primary"
+              size="md"
+              className="w-full mt-6"
               aria-label="Browse Recipes"
               data-testid="browse-recipes-btn"
-              style={{
-                width: "100%",
-                marginTop: "24px",
-                background: "var(--color-primary)",
-                color: "var(--color-text)",
-                fontWeight: "600",
-                padding: "12px 16px",
-                borderRadius: "12px",
-                border: "none",
-                cursor: "pointer",
-                transition: "background-color 0.2s ease",
-                fontFamily: fontFamily,
-                fontSize: "14px",
-              }}
-              onMouseEnter={(e) =>
-                (e.target.style.background = withAlpha(
-                  getComputedStyle(document.documentElement).getPropertyValue(
-                    "--color-primary",
-                  ) || currentTheme.primary,
-                  0.9,
-                ))
-              }
-              onMouseLeave={(e) =>
-                (e.target.style.background =
-                  getComputedStyle(document.documentElement).getPropertyValue(
-                    "--color-primary",
-                  ) || currentTheme.primary)
-              }
             >
               Browse Recipes
-            </button>
+            </Button>
           </div>
 
           {/* Add New Recipe Card */}
@@ -507,44 +483,14 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               Create a new recipe from scratch or use our OCR feature to
               digitize existing recipes.
             </p>
-            <button
+            <Button
               onClick={onAddRecipe}
-              style={{
-                width: "100%",
-                marginTop: "24px",
-                borderRadius: "12px",
-                fontSize: "14px",
-                fontWeight: "600",
-                padding: "12px 16px",
-                background: "var(--color-secondary)",
-                color:
-                  getComputedStyle(document.documentElement).getPropertyValue(
-                    "--color-text",
-                  ) === "#f0fdfa"
-                    ? "#222"
-                    : "white",
-                border: "none",
-                cursor: "pointer",
-                transition: "background-color 0.2s ease",
-                fontFamily: fontFamily,
-              }}
-              onMouseEnter={(e) =>
-                (e.target.style.background = withAlpha(
-                  getComputedStyle(document.documentElement).getPropertyValue(
-                    "--color-secondary",
-                  ) || currentTheme.secondary,
-                  0.9,
-                ))
-              }
-              onMouseLeave={(e) =>
-                (e.target.style.background =
-                  getComputedStyle(document.documentElement).getPropertyValue(
-                    "--color-secondary",
-                  ) || currentTheme.secondary)
-              }
+              variant="secondary"
+              size="md"
+              className="w-full mt-6"
             >
               Create Recipe
-            </button>
+            </Button>
           </div>
 
           {/* Customize Card */}
@@ -647,41 +593,16 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               Personalize your cookbook name, display settings, and choose your
               preferred theme.
             </p>
-            <button
+            <Button
               onClick={onCustomize}
+              variant="tertiary"
+              size="md"
+              className="w-full mt-6"
               aria-label="Customize Settings"
               data-testid="customize-settings-btn"
-              style={{
-                width: "100%",
-                marginTop: "24px",
-                borderRadius: "12px",
-                fontSize: "14px",
-                fontWeight: "600",
-                padding: "12px 16px",
-                background: "var(--color-accent)",
-                color: "white",
-                border: "none",
-                cursor: "pointer",
-                transition: "background-color 0.2s ease",
-                fontFamily: fontFamily,
-              }}
-              onMouseEnter={(e) =>
-                (e.target.style.backgroundColor = withAlpha(
-                  getComputedStyle(document.documentElement).getPropertyValue(
-                    "--color-accent",
-                  ) || currentTheme.accent,
-                  0.9,
-                ))
-              }
-              onMouseLeave={(e) =>
-                (e.target.style.backgroundColor =
-                  getComputedStyle(document.documentElement).getPropertyValue(
-                    "--color-accent",
-                  ) || currentTheme.accent)
-              }
             >
               Settings
-            </button>
+            </Button>
           </div>
         </section>
 

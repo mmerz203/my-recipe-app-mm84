@@ -1,10 +1,7 @@
 import OCRInput from "./OCRInput";
+import Button from "./ui/Button";
 // Add New Recipe Form Page - Complete Recreation for Winsome Designs
 import React, { useState, useEffect, useRef } from "react";
-
-// Exact font family from specifications
-const fontFamily =
-  'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
 
 // Back Arrow Icon
 const BackIcon = ({ size = 18 }) => (
@@ -52,7 +49,12 @@ const LargePlusIcon = ({ size = 32 }) => (
   </svg>
 );
 
-const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel, currentTheme }) => {
+const AddEditRecipeForm = ({
+  initialRecipe,
+  onSave,
+  onCancel,
+  currentTheme,
+}) => {
   console.log("AddEditRecipeForm: currentTheme prop:", currentTheme);
 
   const [recipe, setRecipe] = useState(
@@ -79,8 +81,12 @@ const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel, currentTheme }) =>
       prepTime: parsed.prepTime || prev.prepTime,
       cookTime: parsed.cookTime || prev.cookTime,
       servings: parsed.servings || prev.servings,
-      ingredients: Array.isArray(parsed.ingredients) ? parsed.ingredients.join("\n") : prev.ingredients,
-      instructions: Array.isArray(parsed.instructions) ? parsed.instructions.join("\n") : prev.instructions,
+      ingredients: Array.isArray(parsed.ingredients)
+        ? parsed.ingredients.join("\n")
+        : prev.ingredients,
+      instructions: Array.isArray(parsed.instructions)
+        ? parsed.instructions.join("\n")
+        : prev.instructions,
     }));
   };
 
@@ -176,588 +182,252 @@ const AddEditRecipeForm = ({ initialRecipe, onSave, onCancel, currentTheme }) =>
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "var(--color-background)",
-        fontFamily: fontFamily,
-        fontSize: "16px",
-        fontWeight: "400",
-        lineHeight: "24px",
-        color: "var(--color-text)",
-      }}
-    >
-      {/* Header Section - Exact Specifications */}
-      <header
-        style={{
-          backgroundColor: "rgb(246, 220, 198)",
-          borderBottom: "1px solid rgba(230, 202, 179, 0.2)",
-          padding: "24px 16px",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1024px",
-            margin: "auto",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          {/* Left Side */}
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <button
-              onClick={onCancel}
-              style={{
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                padding: "8px",
-                borderRadius: "6px",
-                transition: "background-color 0.2s ease",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              onMouseEnter={(e) =>
-                (e.target.style.backgroundColor = "rgba(252, 161, 126, 0.1)")
-              }
-              onMouseLeave={(e) =>
-                (e.target.style.backgroundColor = "transparent")
-              }
-            >
-              <BackIcon size={18} />
-            </button>
+    <div className="min-h-screen bg-background text-text font-sans">
+      {/* Header Section - Mobile Optimized */}
+      <header className="bg-background border-b border-border py-4 px-3 sm:py-6 sm:px-4 sticky top-0 z-40 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto">
+          {/* Mobile: Stack vertically, Desktop: Side by side */}
+          <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+            {/* Title Row */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Button
+                onClick={onCancel}
+                variant="ghost"
+                size="sm"
+                className="p-2 sm:p-3 shrink-0"
+                type="button"
+              >
+                <BackIcon size={16} />
+              </Button>
 
-            <div
-              style={{
-                width: "32px",
-                height: "32px",
-                background: "rgb(218, 98, 125)",
-                borderRadius: "8px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <PlusIcon size={20} color="rgba(255, 255, 255, 1)" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary-brand rounded-lg flex items-center justify-center shrink-0">
+                <PlusIcon
+                  size={16}
+                  color="var(--color-primary-contrast, #fff)"
+                />
+              </div>
+
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-text-dark font-sans truncate">
+                {initialRecipe ? "Edit Recipe" : "Add New Recipe"}
+              </h1>
             </div>
 
-            <h1
-              style={{
-                fontSize: "20px",
-                fontWeight: "700",
-                margin: "0",
-                color: "rgb(16, 8, 43)",
-                fontFamily: fontFamily,
-              }}
-            >
-              {initialRecipe ? "Edit Recipe" : "Add New Recipe"}
-            </h1>
-          </div>
-
-          {/* Button Group (Right) */}
-          <div style={{ display: "flex", gap: "12px" }}>
-            <button
-              onClick={onCancel}
-              style={{
-                border: "1px solid rgba(230, 202, 179, 0.3)",
-                background: "transparent",
-                color: "rgb(16, 8, 43)",
-                padding: "8px 16px",
-                borderRadius: "6px",
-                cursor: "pointer",
-                transition: "background-color 0.2s ease",
-                fontFamily: fontFamily,
-                fontWeight: "500",
-              }}
-              onMouseEnter={(e) =>
-                (e.target.style.backgroundColor = "rgba(230, 202, 179, 0.1)")
-              }
-              onMouseLeave={(e) =>
-                (e.target.style.backgroundColor = "transparent")
-              }
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              style={{
-                background: "rgb(218, 98, 125)",
-                color: "white",
-                fontWeight: "600",
-                padding: "8px 16px",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                transition: "background-color 0.2s ease",
-                fontFamily: fontFamily,
-              }}
-              onMouseEnter={(e) =>
-                (e.target.style.backgroundColor = "rgba(218, 98, 125, 0.9)")
-              }
-              onMouseLeave={(e) =>
-                (e.target.style.backgroundColor = "rgb(218, 98, 125)")
-              }
-            >
-              {initialRecipe ? "Update Recipe" : "Save Recipe"}
-            </button>
+            {/* Action Buttons - Mobile: Full width, Desktop: Inline */}
+            <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+              <Button
+                onClick={onCancel}
+                variant="ghost"
+                size="md"
+                className="flex-1 sm:flex-none"
+                type="button"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                variant="primary"
+                size="md"
+                className="flex-1 sm:flex-none"
+                type="submit"
+              >
+                {initialRecipe ? "Update" : "Save Recipe"}
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main
-        style={{
-          maxWidth: "1024px",
-          margin: "auto",
-          padding: "32px 16px",
-        }}
-      >
-        <form onSubmit={handleSubmit}>
-          {/* Top Section - 2 Column Grid */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "32px",
-              marginBottom: "32px",
-            }}
-          >
-            {/* Card 1: Recipe Details (Left Column) */}
-            <div
-              style={{
-                background: "rgba(255, 255, 255, 0.5)",
-                backdropFilter: "blur(4px)",
-                border: "1px solid rgba(230, 202, 179, 0.2)",
-                borderRadius: "12px",
-              }}
-            >
-              <div style={{ padding: "24px 24px 0" }}>
-                <h2
-                  style={{
-                    fontSize: "18px",
-                    fontWeight: "600",
-                    color: "rgb(16, 8, 43)",
-                    margin: "0",
-                    fontFamily: fontFamily,
-                  }}
-                >
-                  Recipe Details
-                </h2>
+      <main className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-8 pb-20 sm:pb-8">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          {/* Recipe Details Section */}
+          <div className="bg-card backdrop-blur border border-neutral-subtle/20 rounded-xl p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-text-dark mb-4 sm:mb-6">
+              Recipe Details
+            </h2>
+
+            <div className="space-y-4 sm:space-y-6">
+              {/* Recipe Title */}
+              <div>
+                <label className="text-sm font-medium text-text-dark mb-2 block">
+                  Recipe Title *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={recipe.name}
+                  onChange={handleChange}
+                  placeholder="Enter recipe name..."
+                  className={`bg-white/50 border ${
+                    errors.name ? "border-error" : "border-neutral-subtle/30"
+                  } rounded-lg px-4 py-3 text-base text-text-dark w-full outline-none focus:ring-2 focus:ring-primary-brand/50 focus:border-primary-brand transition-colors min-h-[48px]`}
+                />
+                {errors.name && (
+                  <p className="text-xs text-error mt-1">{errors.name}</p>
+                )}
               </div>
 
-              <div style={{ padding: "0 24px 24px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "24px",
-                  }}
-                >
-                  {/* Recipe Title Field */}
-                  <div>
-                    <label
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: "500",
-                        color: "rgb(16, 8, 43)",
-                        marginBottom: "8px",
-                        display: "block",
-                        fontFamily: fontFamily,
-                      }}
-                    >
-                      Recipe Title
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={recipe.name}
-                      onChange={handleChange}
-                      placeholder="Enter recipe name..."
-                      style={{
-                        background: "rgba(255, 255, 255, 0.5)",
-                        border: `1px solid ${errors.name ? "rgb(211, 96, 96)" : "rgba(230, 202, 179, 0.3)"}`,
-                        borderRadius: "6px",
-                        padding: "8px 12px",
-                        fontSize: "14px",
-                        color: "rgb(16, 8, 43)",
-                        width: "100%",
-                        fontFamily: fontFamily,
-                        outline: "none",
-                        boxSizing: "border-box",
-                        backgroundColor: errors.name
-                          ? "rgba(211, 96, 96, 0.05)"
-                          : "rgba(255, 255, 255, 0.5)",
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.outline = "2px solid rgb(218, 98, 125)";
-                        e.target.style.outlineOffset = "2px";
-                        e.target.style.borderColor = "rgb(218, 98, 125)";
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.outline = "none";
-                        e.target.style.borderColor = errors.name
-                          ? "rgb(211, 96, 96)"
-                          : "rgba(230, 202, 179, 0.3)";
-                      }}
-                    />
-                    {errors.name && (
-                      <p
-                        style={{
-                          fontSize: "12px",
-                          color: "rgb(211, 96, 96)",
-                          margin: "4px 0 0 0",
-                        }}
-                      >
-                        {errors.name}
-                      </p>
-                    )}
-                  </div>
+              {/* Description */}
+              <div>
+                <label className="text-sm font-medium text-text-dark mb-2 block">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={recipe.description}
+                  onChange={handleChange}
+                  placeholder="Brief description of the recipe..."
+                  rows="3"
+                  className="bg-white/50 border border-neutral-subtle/30 rounded-lg px-4 py-3 text-base text-text-dark w-full min-h-[96px] resize-y outline-none focus:ring-2 focus:ring-primary-brand/50 focus:border-primary-brand transition-colors"
+                />
+              </div>
 
-                  {/* Description Field */}
-                  <div>
-                    <label
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: "500",
-                        color: "rgb(16, 8, 43)",
-                        marginBottom: "8px",
-                        display: "block",
-                        fontFamily: fontFamily,
-                      }}
-                    >
-                      Description
-                    </label>
-                    <textarea
-                      name="description"
-                      value={recipe.description}
-                      onChange={handleChange}
-                      placeholder="Brief description of the recipe..."
-                      rows="3"
-                      style={{
-                        background: "rgba(255, 255, 255, 0.5)",
-                        border: "1px solid rgba(230, 202, 179, 0.3)",
-                        borderRadius: "6px",
-                        padding: "8px 12px",
-                        fontSize: "14px",
-                        color: "rgb(16, 8, 43)",
-                        width: "100%",
-                        minHeight: "72px",
-                        resize: "vertical",
-                        fontFamily: fontFamily,
-                        outline: "none",
-                        boxSizing: "border-box",
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.outline = "2px solid rgb(218, 98, 125)";
-                        e.target.style.outlineOffset = "2px";
-                        e.target.style.borderColor = "rgb(218, 98, 125)";
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.outline = "none";
-                        e.target.style.borderColor = "rgba(230, 202, 179, 0.3)";
-                      }}
-                    />
-                  </div>
+              {/* Time and Servings Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-text-dark mb-2 block">
+                    Prep Time
+                  </label>
+                  <input
+                    type="text"
+                    name="prepTime"
+                    value={recipe.prepTime}
+                    onChange={handleChange}
+                    placeholder="15 min"
+                    className="bg-white/50 border border-neutral-subtle/30 rounded-lg px-4 py-3 text-base text-text-dark w-full outline-none focus:ring-2 focus:ring-primary-brand/50 focus:border-primary-brand transition-colors min-h-[48px]"
+                  />
+                </div>
 
-                  {/* Time Fields (2-column sub-grid) */}
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
-                      gap: "16px",
-                    }}
-                  >
-                    <div>
-                      <label
-                        style={{
-                          fontSize: "14px",
-                          fontWeight: "500",
-                          color: "rgb(16, 8, 43)",
-                          marginBottom: "8px",
-                          display: "block",
-                          fontFamily: fontFamily,
-                        }}
-                      >
-                        Prep Time
-                      </label>
-                      <input
-                        type="text"
-                        name="prepTime"
-                        value={recipe.prepTime}
-                        onChange={handleChange}
-                        placeholder="15 minutes"
-                        style={{
-                          background: "rgba(255, 255, 255, 0.5)",
-                          border: "1px solid rgba(230, 202, 179, 0.3)",
-                          borderRadius: "6px",
-                          padding: "8px 12px",
-                          fontSize: "14px",
-                          color: "rgb(16, 8, 43)",
-                          width: "100%",
-                          fontFamily: fontFamily,
-                          outline: "none",
-                          boxSizing: "border-box",
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.outline =
-                            "2px solid rgb(218, 98, 125)";
-                          e.target.style.outlineOffset = "2px";
-                          e.target.style.borderColor = "rgb(218, 98, 125)";
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.outline = "none";
-                          e.target.style.borderColor =
-                            "rgba(230, 202, 179, 0.3)";
-                        }}
-                      />
-                    </div>
+                <div>
+                  <label className="text-sm font-medium text-text-dark mb-2 block">
+                    Cook Time
+                  </label>
+                  <input
+                    type="text"
+                    name="cookTime"
+                    value={recipe.cookTime}
+                    onChange={handleChange}
+                    placeholder="30 min"
+                    className="bg-white/50 border border-neutral-subtle/30 rounded-lg px-4 py-3 text-base text-text-dark w-full outline-none focus:ring-2 focus:ring-primary-brand/50 focus:border-primary-brand transition-colors min-h-[48px]"
+                  />
+                </div>
 
-                    <div>
-                      <label
-                        style={{
-                          fontSize: "14px",
-                          fontWeight: "500",
-                          color: "rgb(16, 8, 43)",
-                          marginBottom: "8px",
-                          display: "block",
-                          fontFamily: fontFamily,
-                        }}
-                      >
-                        Cook Time
-                      </label>
-                      <input
-                        type="text"
-                        name="cookTime"
-                        value={recipe.cookTime}
-                        onChange={handleChange}
-                        placeholder="30 minutes"
-                        style={{
-                          background: "rgba(255, 255, 255, 0.5)",
-                          border: "1px solid rgba(230, 202, 179, 0.3)",
-                          borderRadius: "6px",
-                          padding: "8px 12px",
-                          fontSize: "14px",
-                          color: "rgb(16, 8, 43)",
-                          width: "100%",
-                          fontFamily: fontFamily,
-                          outline: "none",
-                          boxSizing: "border-box",
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.outline =
-                            "2px solid rgb(218, 98, 125)";
-                          e.target.style.outlineOffset = "2px";
-                          e.target.style.borderColor = "rgb(218, 98, 125)";
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.outline = "none";
-                          e.target.style.borderColor =
-                            "rgba(230, 202, 179, 0.3)";
-                        }}
-                      />
-                    </div>
-                  </div>
+                <div>
+                  <label className="text-sm font-medium text-text-dark mb-2 block">
+                    Servings
+                  </label>
+                  <input
+                    type="number"
+                    name="servings"
+                    value={recipe.servings}
+                    onChange={handleChange}
+                    placeholder="4"
+                    min="1"
+                    className="bg-white/50 border border-neutral-subtle/30 rounded-lg px-4 py-3 text-base text-text-dark w-full outline-none focus:ring-2 focus:ring-primary-brand/50 focus:border-primary-brand transition-colors min-h-[48px]"
+                  />
                 </div>
               </div>
-            </div>
 
-            {/* Card 2: OCR Recipe Import (Right Column) */}
-            <div
-              style={{
-                background: "rgba(255, 255, 255, 0.5)",
-                backdropFilter: "blur(4px)",
-                border: "1px solid rgba(230, 202, 179, 0.2)",
-                borderRadius: "12px",
-              }}
-            >
-              <div style={{ padding: "24px 24px 0" }}>
-                <h2
-                  style={{
-                    fontSize: "18px",
-                    fontWeight: "600",
-                    color: "rgb(16, 8, 43)",
-                    margin: "0",
-                    fontFamily: fontFamily,
-                  }}
+              {/* Category */}
+              <div>
+                <label className="text-sm font-medium text-text-dark mb-2 block">
+                  Category
+                </label>
+                <select
+                  name="category"
+                  value={recipe.category}
+                  onChange={handleChange}
+                  className="bg-white/50 border border-neutral-subtle/30 rounded-lg px-4 py-3 text-base text-text-dark w-full outline-none focus:ring-2 focus:ring-primary-brand/50 focus:border-primary-brand transition-colors min-h-[48px]"
                 >
-                  OCR Recipe Import
-                </h2>
-              </div>
-
-              <div style={{ padding: "0 24px 24px" }}>
-                {/* OCR Upload Section */}
-                {/* OCR Upload Section (replaces previous image upload UI) */}
-                <OCRInput onRecipeParsed={handleRecipeParsedFromOCR} />
+                  <option value="Appetizer">Appetizer</option>
+                  <option value="Main Course">Main Course</option>
+                  <option value="Dessert">Dessert</option>
+                  <option value="Beverage">Beverage</option>
+                  <option value="Snack">Snack</option>
+                  <option value="Breakfast">Breakfast</option>
+                  <option value="Lunch">Lunch</option>
+                  <option value="Dinner">Dinner</option>
+                </select>
               </div>
             </div>
           </div>
 
-          {/* Bottom Section - Large Text Areas */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "32px",
-            }}
-          >
-            {/* Card 3: Ingredients (Left) */}
-            <div
-              style={{
-                background: "rgba(255, 255, 255, 0.5)",
-                backdropFilter: "blur(4px)",
-                border: "1px solid rgba(230, 202, 179, 0.2)",
-                borderRadius: "12px",
-              }}
-            >
-              <div style={{ padding: "24px 24px 0" }}>
-                <h2
-                  style={{
-                    fontSize: "18px",
-                    fontWeight: "600",
-                    color: "rgb(16, 8, 43)",
-                    margin: "0",
-                    fontFamily: fontFamily,
-                  }}
-                >
-                  Ingredients
-                </h2>
-              </div>
+          {/* OCR Import Section */}
+          <div className="bg-card backdrop-blur border border-neutral-subtle/20 rounded-xl p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-text-dark mb-4">
+              Import from Image
+            </h2>
+            <OCRInput onRecipeParsed={handleRecipeParsedFromOCR} />
+          </div>
 
-              <div style={{ padding: "0 24px 24px" }}>
-                <textarea
-                  name="ingredients"
-                  value={recipe.ingredients}
+          {/* Ingredients Section */}
+          <div className="bg-card backdrop-blur border border-neutral-subtle/20 rounded-xl p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-text-dark mb-4">
+              Ingredients *
+            </h2>
+            <textarea
+              name="ingredients"
+              value={recipe.ingredients}
+              onChange={handleChange}
+              placeholder="List ingredients, one per line:&#10;• 2 cups flour&#10;• 1 tsp salt&#10;• 3 eggs"
+              rows={window.innerWidth < 640 ? "8" : "12"}
+              className={`bg-white/50 border ${
+                errors.ingredients ? "border-error" : "border-neutral-subtle/30"
+              } rounded-lg px-4 py-3 text-base text-text-dark w-full min-h-[200px] sm:min-h-[280px] resize-y font-mono outline-none focus:ring-2 focus:ring-primary-brand/50 focus:border-primary-brand transition-colors`}
+            />
+            {errors.ingredients && (
+              <p className="text-xs text-error mt-1">{errors.ingredients}</p>
+            )}
+          </div>
+
+          {/* Instructions Section */}
+          <div className="bg-card backdrop-blur border border-neutral-subtle/20 rounded-xl p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-text-dark mb-4">
+              Instructions *
+            </h2>
+            <textarea
+              name="instructions"
+              value={recipe.instructions}
+              onChange={handleChange}
+              placeholder="Write step-by-step instructions:&#10;1. Preheat oven to 350°F&#10;2. Mix dry ingredients in a bowl&#10;3. Add wet ingredients and stir"
+              rows={window.innerWidth < 640 ? "10" : "15"}
+              className={`bg-white/50 border ${
+                errors.instructions
+                  ? "border-error"
+                  : "border-neutral-subtle/30"
+              } rounded-lg px-4 py-3 text-base text-text-dark w-full min-h-[250px] sm:min-h-[350px] resize-y outline-none focus:ring-2 focus:ring-primary-brand/50 focus:border-primary-brand transition-colors`}
+            />
+            {errors.instructions && (
+              <p className="text-xs text-error mt-1">{errors.instructions}</p>
+            )}
+          </div>
+
+          {/* Privacy Settings */}
+          <div className="bg-card backdrop-blur border border-neutral-subtle/20 rounded-xl p-4 sm:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-semibold text-text-dark">
+                  Make Recipe Public
+                </h3>
+                <p className="text-sm text-neutral-subtle mt-1">
+                  Allow others to discover and view this recipe
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="isPublic"
+                  checked={recipe.isPublic}
                   onChange={handleChange}
-                  placeholder="List your ingredients here..."
-                  rows="10"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.5)",
-                    border: `1px solid ${errors.ingredients ? "rgb(211, 96, 96)" : "rgba(230, 202, 179, 0.3)"}`,
-                    borderRadius: "6px",
-                    padding: "12px",
-                    fontSize: "14px",
-                    color: "rgb(16, 8, 43)",
-                    width: "100%",
-                    minHeight: "240px",
-                    resize: "vertical",
-                    fontFamily: '"Courier New", monospace',
-                    outline: "none",
-                    boxSizing: "border-box",
-                    backgroundColor: errors.ingredients
-                      ? "rgba(211, 96, 96, 0.05)"
-                      : "rgba(255, 255, 255, 0.5)",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.outline = "2px solid rgb(218, 98, 125)";
-                    e.target.style.outlineOffset = "2px";
-                    e.target.style.borderColor = "rgb(218, 98, 125)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.outline = "none";
-                    e.target.style.borderColor = errors.ingredients
-                      ? "rgb(211, 96, 96)"
-                      : "rgba(230, 202, 179, 0.3)";
-                  }}
+                  className="sr-only peer"
                 />
-                {errors.ingredients && (
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      color: "rgb(211, 96, 96)",
-                      margin: "4px 0 0 0",
-                    }}
-                  >
-                    {errors.ingredients}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Card 4: Instructions (Right) */}
-            <div
-              style={{
-                background: "rgba(255, 255, 255, 0.5)",
-                backdropFilter: "blur(4px)",
-                border: "1px solid rgba(230, 202, 179, 0.2)",
-                borderRadius: "12px",
-              }}
-            >
-              <div style={{ padding: "24px 24px 0" }}>
-                <h2
-                  style={{
-                    fontSize: "18px",
-                    fontWeight: "600",
-                    color: "rgb(16, 8, 43)",
-                    margin: "0",
-                    fontFamily: fontFamily,
-                  }}
-                >
-                  Instructions
-                </h2>
-              </div>
-
-              <div style={{ padding: "0 24px 24px" }}>
-                <textarea
-                  name="instructions"
-                  value={recipe.instructions}
-                  onChange={handleChange}
-                  placeholder="Step-by-step cooking instructions..."
-                  rows="10"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.5)",
-                    border: `1px solid ${errors.instructions ? "rgb(211, 96, 96)" : "rgba(230, 202, 179, 0.3)"}`,
-                    borderRadius: "6px",
-                    padding: "12px",
-                    fontSize: "14px",
-                    color: "rgb(16, 8, 43)",
-                    width: "100%",
-                    minHeight: "240px",
-                    resize: "vertical",
-                    fontFamily: fontFamily,
-                    outline: "none",
-                    boxSizing: "border-box",
-                    backgroundColor: errors.instructions
-                      ? "rgba(211, 96, 96, 0.05)"
-                      : "rgba(255, 255, 255, 0.5)",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.outline = "2px solid rgb(218, 98, 125)";
-                    e.target.style.outlineOffset = "2px";
-                    e.target.style.borderColor = "rgb(218, 98, 125)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.outline = "none";
-                    e.target.style.borderColor = errors.instructions
-                      ? "rgb(211, 96, 96)"
-                      : "rgba(230, 202, 179, 0.3)";
-                  }}
-                />
-                {errors.instructions && (
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      color: "rgb(211, 96, 96)",
-                      margin: "4px 0 0 0",
-                    }}
-                  >
-                    {errors.instructions}
-                  </p>
-                )}
-              </div>
+                <div className="w-11 h-6 bg-neutral-subtle/30 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-brand/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-brand"></div>
+              </label>
             </div>
           </div>
         </form>
 
-        {/* Responsive CSS */}
-        <style>{`
-          @media (max-width: 1024px) {
-            .recipe-form-grid {
-              grid-template-columns: 1fr !important;
-            }
-          }
-        `}</style>
+        {/* Responsive CSS removed: all layout is now Tailwind-based */}
       </main>
     </div>
   );

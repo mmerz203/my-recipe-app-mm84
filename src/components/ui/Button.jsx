@@ -1,146 +1,264 @@
-// Modern Button component for Winsome Designs with glass morphism and CSS variables
-import React, { useState } from "react";
+// Sophisticated Button component for Winsome Designs with dynamic theme inheritance
+import React from "react";
 
 const Button = ({
   children,
   variant = "primary",
   size = "md",
   disabled = false,
+  className = "",
   style = {},
   ...props
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
+  // Base classes for sophisticated design (no theme colors here)
+  const baseClasses = [
+    "inline-flex",
+    "items-center",
+    "justify-center",
+    "font-semibold",
+    "border-none",
+    "transition-all",
+    "duration-300",
+    "cursor-pointer",
+    "focus:outline-none",
+    "disabled:cursor-not-allowed",
+    "disabled:opacity-50",
+    "font-sans",
+    "backdrop-blur-sm",
+    "relative",
+    "overflow-hidden",
+    "shadow-lg",
+    "hover:shadow-xl",
+    "hover:-translate-y-1",
+    "hover:scale-105",
+    "active:scale-95",
+    "active:translate-y-0",
+  ];
 
-  const fontFamily = "ui-sans-serif, system-ui, sans-serif";
-
-  // Size configurations
-  const sizes = {
-    xs: { padding: "6px 12px", fontSize: "12px", borderRadius: "8px" },
-    sm: { padding: "8px 16px", fontSize: "14px", borderRadius: "10px" },
-    md: { padding: "12px 20px", fontSize: "15px", borderRadius: "12px" },
-    lg: { padding: "16px 24px", fontSize: "16px", borderRadius: "14px" },
-    xl: { padding: "20px 32px", fontSize: "18px", borderRadius: "16px" },
+  // Size configurations (no colors)
+  const sizeClasses = {
+    xs: ["px-4", "py-2", "text-xs", "rounded-xl", "min-h-[32px]"],
+    sm: ["px-5", "py-2.5", "text-sm", "rounded-xl", "min-h-[36px]"],
+    md: ["px-6", "py-3", "text-base", "rounded-xl", "min-h-[44px]"],
+    lg: ["px-8", "py-4", "text-lg", "rounded-2xl", "min-h-[52px]"],
+    xl: ["px-10", "py-5", "text-xl", "rounded-2xl", "min-h-[60px]"],
   };
 
-  // Base styles that apply to all variants
-  const baseStyles = {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontWeight: "600",
-    fontFamily,
-    border: "none",
-    cursor: disabled ? "not-allowed" : "pointer",
-    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-    position: "relative",
-    overflow: "hidden",
-    userSelect: "none",
-    outline: "none",
-    transform: isHovered && !disabled ? "translateY(-1px)" : "translateY(0)",
-    ...sizes[size],
-  };
-
-  // Variant-specific styles using CSS variables
+  // Dynamic theme-based styles using CSS variables
   const getVariantStyles = () => {
-    const opacity = disabled ? 0.5 : 1;
+    const commonStyles = {
+      position: "relative",
+      overflow: "hidden",
+    };
+
+    // Before pseudo-element for gradient overlay (common to all solid variants)
+    const gradientOverlay = {
+      "&::before": {
+        content: '""',
+        position: "absolute",
+        inset: 0,
+        background:
+          "linear-gradient(to right, rgba(255,255,255,0.1), transparent)",
+        opacity: 0,
+        transition: "opacity 0.3s ease",
+        pointerEvents: "none",
+        zIndex: 1,
+      },
+      "&:hover::before": {
+        opacity: 1,
+      },
+    };
 
     switch (variant) {
       case "primary":
         return {
-          background: "var(--color-primary)",
-          color: "var(--color-text)",
+          ...commonStyles,
+          background: "rgba(var(--color-primary-rgb, 252, 161, 126), 0.9)",
+          color: "#ffffff",
+          border:
+            "1px solid rgba(var(--color-primary-rgb, 252, 161, 126), 0.2)",
           boxShadow:
-            isHovered && !disabled
-              ? "0 8px 25px -8px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05)"
-              : "0 2px 8px -2px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.05)",
-          backdropFilter: "blur(8px)",
-          opacity,
+            "0 4px 16px rgba(var(--color-primary-rgb, 252, 161, 126), 0.25)",
+          "&:hover": {
+            background: "var(--color-primary)",
+            boxShadow:
+              "0 8px 32px rgba(var(--color-primary-rgb, 252, 161, 126), 0.4)",
+          },
+          "&:focus": {
+            outline: "none",
+            boxShadow:
+              "0 0 0 4px rgba(var(--color-primary-rgb, 252, 161, 126), 0.3)",
+          },
         };
 
       case "secondary":
         return {
-          background: "var(--color-secondary)",
-          color: "white",
+          ...commonStyles,
+          background: "rgba(var(--color-secondary-rgb, 218, 98, 125), 0.9)",
+          color: "#ffffff",
+          border:
+            "1px solid rgba(var(--color-secondary-rgb, 218, 98, 125), 0.2)",
           boxShadow:
-            isHovered && !disabled
-              ? "0 8px 25px -8px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)"
-              : "0 2px 8px -2px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.1)",
-          backdropFilter: "blur(8px)",
-          opacity,
+            "0 4px 16px rgba(var(--color-secondary-rgb, 218, 98, 125), 0.25)",
+          "&:hover": {
+            background: "var(--color-secondary)",
+            boxShadow:
+              "0 8px 32px rgba(var(--color-secondary-rgb, 218, 98, 125), 0.4)",
+          },
+          "&:focus": {
+            outline: "none",
+            boxShadow:
+              "0 0 0 4px rgba(var(--color-secondary-rgb, 218, 98, 125), 0.3)",
+          },
+        };
+
+      case "tertiary":
+        return {
+          ...commonStyles,
+          background: "rgba(var(--color-accent-rgb, 154, 52, 142), 0.9)",
+          color: "#ffffff",
+          border: "1px solid rgba(var(--color-accent-rgb, 154, 52, 142), 0.2)",
+          boxShadow:
+            "0 4px 16px rgba(var(--color-accent-rgb, 154, 52, 142), 0.25)",
+          "&:hover": {
+            background: "var(--color-accent)",
+            boxShadow:
+              "0 8px 32px rgba(var(--color-accent-rgb, 154, 52, 142), 0.4)",
+          },
+          "&:focus": {
+            outline: "none",
+            boxShadow:
+              "0 0 0 4px rgba(var(--color-accent-rgb, 154, 52, 142), 0.3)",
+          },
         };
 
       case "outline":
         return {
-          background:
-            isHovered && !disabled
-              ? "rgba(255, 255, 255, 0.1)"
-              : "rgba(255, 255, 255, 0.05)",
+          ...commonStyles,
+          background: "rgba(var(--color-card-rgb, 255, 255, 255), 0.6)",
           color: "var(--color-primary)",
-          border: "1.5px solid var(--color-primary)",
-          boxShadow:
-            isHovered && !disabled
-              ? "0 8px 25px -8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)"
-              : "0 2px 8px -2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.05)",
-          backdropFilter: "blur(8px)",
-          opacity,
+          border: "2px solid var(--color-primary)",
+          backdropFilter: "blur(16px)",
+          "&:hover": {
+            background: "rgba(var(--color-primary-rgb, 252, 161, 126), 0.1)",
+            boxShadow:
+              "0 8px 32px rgba(var(--color-primary-rgb, 252, 161, 126), 0.2)",
+          },
+          "&:focus": {
+            outline: "none",
+            boxShadow:
+              "0 0 0 4px rgba(var(--color-primary-rgb, 252, 161, 126), 0.3)",
+          },
         };
 
       case "ghost":
         return {
-          background:
-            isHovered && !disabled ? "rgba(255, 255, 255, 0.1)" : "transparent",
+          ...commonStyles,
+          background: "rgba(var(--color-card-rgb, 255, 255, 255), 0.4)",
           color: "var(--color-text)",
-          boxShadow:
-            isHovered && !disabled
-              ? "0 4px 12px -4px rgba(0, 0, 0, 0.1)"
-              : "none",
-          opacity,
+          border: "1px solid rgba(var(--color-text-rgb, 16, 8, 43), 0.1)",
+          backdropFilter: "blur(16px)",
+          "&:hover": {
+            background: "rgba(var(--color-card-rgb, 255, 255, 255), 0.6)",
+            border:
+              "1px solid rgba(var(--color-primary-rgb, 252, 161, 126), 0.5)",
+          },
+          "&:focus": {
+            outline: "none",
+            boxShadow:
+              "0 0 0 4px rgba(var(--color-primary-rgb, 252, 161, 126), 0.3)",
+          },
         };
 
       case "accent":
         return {
-          background: "var(--color-accent)",
-          color: "white",
+          ...commonStyles,
+          background: "rgba(var(--color-accent-rgb, 154, 52, 142), 0.9)",
+          color: "#ffffff",
+          border: "1px solid rgba(var(--color-accent-rgb, 154, 52, 142), 0.2)",
           boxShadow:
-            isHovered && !disabled
-              ? "0 8px 25px -8px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)"
-              : "0 2px 8px -2px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.1)",
-          backdropFilter: "blur(8px)",
-          opacity,
+            "0 4px 16px rgba(var(--color-accent-rgb, 154, 52, 142), 0.25)",
+          "&:hover": {
+            background: "var(--color-accent)",
+            boxShadow:
+              "0 8px 32px rgba(var(--color-accent-rgb, 154, 52, 142), 0.4)",
+          },
+          "&:focus": {
+            outline: "none",
+            boxShadow:
+              "0 0 0 4px rgba(var(--color-accent-rgb, 154, 52, 142), 0.3)",
+          },
+        };
+
+      case "destructive":
+        return {
+          ...commonStyles,
+          background: "rgba(var(--color-error-rgb, 211, 96, 96), 0.9)",
+          color: "#ffffff",
+          border: "1px solid rgba(var(--color-error-rgb, 211, 96, 96), 0.2)",
+          boxShadow:
+            "0 4px 16px rgba(var(--color-error-rgb, 211, 96, 96), 0.25)",
+          "&:hover": {
+            background: "var(--color-error)",
+            boxShadow:
+              "0 8px 32px rgba(var(--color-error-rgb, 211, 96, 96), 0.4)",
+          },
+          "&:focus": {
+            outline: "none",
+            boxShadow:
+              "0 0 0 4px rgba(var(--color-error-rgb, 211, 96, 96), 0.3)",
+          },
         };
 
       default:
-        return {};
+        return commonStyles;
     }
   };
 
-  // Focus ring styles
-  const focusStyles =
-    isFocused && !disabled
-      ? {
-          boxShadow: `${getVariantStyles().boxShadow}, 0 0 0 3px rgba(var(--color-primary-rgb, 252, 161, 126), 0.3)`,
-        }
-      : {};
+  // Combine classes
+  const allClasses = [...baseClasses, ...sizeClasses[size], className].join(
+    " ",
+  );
 
-  const finalStyles = {
-    ...baseStyles,
-    ...getVariantStyles(),
-    ...focusStyles,
+  // Merge styles
+  const variantStyles = getVariantStyles();
+  const finalStyle = {
+    ...variantStyles,
     ...style,
   };
 
   return (
     <button
-      style={finalStyles}
+      className={allClasses}
+      style={finalStyle}
       disabled={disabled}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onFocus={() => setIsFocused(true)}
-      onBlur={() => setIsFocused(false)}
       {...props}
     >
-      {children}
+      <span
+        style={{
+          position: "relative",
+          zIndex: 10,
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+        }}
+      >
+        {children}
+      </span>
+      {/* Gradient overlay for hover effect */}
+      <span
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(to right, rgba(255,255,255,0.1), transparent)",
+          opacity: 0,
+          transition: "opacity 0.3s ease",
+          pointerEvents: "none",
+          zIndex: 1,
+        }}
+        className="button-gradient-overlay"
+      />
     </button>
   );
 };

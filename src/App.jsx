@@ -175,7 +175,6 @@ const App = () => {
     setAppError(null);
   };
 
-
   // Use centralized theme system
   const currentTheme = getThemeColors(preferences);
   // Set CSS variables globally for the current theme
@@ -199,7 +198,15 @@ const App = () => {
   if (!authReady || loadingPreferences) {
     return (
       <div style={backgroundStyle}>
-        <div style={{ textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
+        <div
+          style={{
+            textAlign: "center",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "100vh",
+          }}
+        >
           <LoadingSpinner />
           <p
             style={{
@@ -233,7 +240,7 @@ const App = () => {
       {/* Global Error Display */}
       {appError && (
         <div className="fixed top-4 right-4 z-50 max-w-md">
-          <div className="bg-white border-2 border-winsome-error text-winsome-error px-4 py-3 rounded-xl shadow-lg animate-scale-in">
+          <div className="bg-card border-2 border-error text-error px-4 py-3 rounded-xl shadow-lg animate-scale-in">
             <div className="flex items-start justify-between">
               <div>
                 <strong className="font-bold">Error:</strong>
@@ -241,7 +248,7 @@ const App = () => {
               </div>
               <button
                 onClick={() => setAppError(null)}
-                className="ml-4 text-winsome-error hover:text-winsome-error/70 transition-colors"
+                className="ml-4 text-error hover:text-error/70 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-error/50 rounded p-1"
               >
                 <svg
                   className="w-5 h-5"
@@ -316,7 +323,12 @@ const App = () => {
             currentTheme={currentTheme}
           />
         )}
-        {view === "settings" && <SettingsPage onBack={() => setView("home")} currentTheme={currentTheme} />}
+        {view === "settings" && (
+          <SettingsPage
+            onBack={() => setView("home")}
+            currentTheme={currentTheme}
+          />
+        )}
       </main>
 
       {/* Footer is rendered by ExactHomepage on home view; removed from here to prevent duplicate footers */}

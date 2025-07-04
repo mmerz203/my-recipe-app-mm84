@@ -14,36 +14,9 @@ const RecipeDetail = ({ recipe, onBack, onEdit, currentTheme }) => {
 
   if (!recipe) {
     return (
-      <main
-        style={{
-          maxWidth: "1152px",
-          margin: "auto",
-          padding: "64px 16px",
-          minHeight: "calc(100vh - 64px)",
-          background: "var(--color-background)",
-        }}
-      >
-        <div
-          style={{
-            background: "rgba(255, 255, 255, 0.5)",
-            backdropFilter: "blur(4px)",
-            borderRadius: "12px",
-            border: "1px solid rgba(0, 0, 0, 0.1)",
-            padding: "32px",
-            textAlign: "center",
-            boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "18px",
-              color: "rgba(var(--color-text-rgb), 0.7)",
-              margin: "0 0 24px 0",
-              fontFamily: "ui-sans-serif, system-ui, sans-serif",
-            }}
-          >
-            Recipe not found.
-          </p>
+      <main className="max-w-5xl mx-auto py-16 px-4 min-h-[calc(100vh-64px)] bg-background">
+        <div className="bg-white/50 backdrop-blur-sm rounded-xl border border-black/10 p-8 text-center shadow-sm">
+          <p className="text-lg text-text-dark/70 mb-6 font-sans">Recipe not found.</p>
           <Button onClick={onBack} variant="secondary" size="md">
             ← Back to List
           </Button>
@@ -69,54 +42,16 @@ const RecipeDetail = ({ recipe, onBack, onEdit, currentTheme }) => {
   };
 
   return (
-    <main
-      style={{
-        maxWidth: "1152px",
-        margin: "auto",
-        padding: "64px 16px",
-        minHeight: "calc(100vh - 64px)",
-        background: "var(--color-background)",
-        fontFamily: "ui-sans-serif, system-ui, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          background: "rgba(255, 255, 255, 0.5)",
-          backdropFilter: "blur(4px)",
-          borderRadius: "12px",
-          border: "1px solid rgba(0, 0, 0, 0.1)",
-          padding: "32px",
-          boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "32px",
-            paddingBottom: "24px",
-            borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
-            flexWrap: "wrap",
-            gap: "16px",
-          }}
-        >
+    <main className="max-w-5xl mx-auto py-16 px-4 min-h-[calc(100vh-64px)] bg-background font-sans">
+      <div className="bg-white/50 backdrop-blur-sm rounded-xl border border-black/10 p-8 shadow-sm">
+        <div className="flex justify-between items-center mb-8 pb-6 border-b border-black/10 flex-wrap gap-4">
           <Button
             onClick={onBack}
             variant="outline"
             size="md"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
+            className="flex items-center gap-2"
           >
-            <svg
-              style={{ width: "20px", height: "20px" }}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -131,18 +66,9 @@ const RecipeDetail = ({ recipe, onBack, onEdit, currentTheme }) => {
               onClick={onEdit}
               variant="primary"
               size="md"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
+              className="flex items-center gap-2"
             >
-              <svg
-                style={{ width: "20px", height: "20px" }}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -159,56 +85,22 @@ const RecipeDetail = ({ recipe, onBack, onEdit, currentTheme }) => {
           show={showShareModal}
           title="Share Recipe"
           message={
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <p
-                style={{
-                  color: "var(--color-text)",
-                  opacity: 0.7,
-                  marginBottom: "16px",
-                  fontSize: "16px",
-                  fontFamily: "ui-sans-serif, system-ui, sans-serif",
-                }}
-              >
-                You can share this recipe using the ID below:
-              </p>
+            <div className="flex flex-col items-center">
+              <p className="text-base text-text-dark/70 mb-4 font-sans">You can share this recipe using the ID below:</p>
               <input
                 type="text"
                 ref={shareLinkRef}
                 readOnly
                 value={generateShareLink()}
-                style={{
-                  width: "100%",
-                  padding: "8px 12px",
-                  border: "1px solid rgba(0, 0, 0, 0.2)",
-                  borderRadius: "8px",
-                  marginBottom: "12px",
-                  fontSize: "14px",
-                  background: "rgba(0, 0, 0, 0.05)",
-                  fontFamily: "ui-monospace, monospace",
-                }}
+                className="w-full px-3 py-2 border border-black/20 rounded-lg mb-3 text-sm bg-black/5 font-mono"
               />
               <Button
                 onClick={handleCopyLink}
                 variant="primary"
                 size="sm"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
+                className="flex items-center gap-2"
               >
-                <svg
-                  style={{ width: "16px", height: "16px" }}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -218,65 +110,25 @@ const RecipeDetail = ({ recipe, onBack, onEdit, currentTheme }) => {
                 </svg>
                 {copyMessage || "Copy Link"}
               </Button>
-              <p
-                style={{
-                  fontSize: "12px",
-                  color: "var(--color-text)",
-                  opacity: 0.5,
-                  marginTop: "8px",
-                  fontFamily: "ui-sans-serif, system-ui, sans-serif",
-                }}
-              >
-                Note: For a fully functional shareable link on a live website,
-                this would be a direct URL.
+              <p className="text-xs text-text-dark/50 mt-2 font-sans">
+                Note: For a fully functional shareable link on a live website, this would be a direct URL.
               </p>
             </div>
           }
           onClose={() => setShowShareModal(false)}
         />
 
-        <h1
-          style={{
-            fontSize: "36px",
-            fontWeight: "700",
-            color: "var(--color-text)",
-            marginBottom: "16px",
-            textAlign: "center",
-            fontFamily: "ui-sans-serif, system-ui, sans-serif",
-          }}
-        >
-          {recipe.name}
-        </h1>
-        <p
-          style={{
-            color: "var(--color-text)",
-            opacity: 0.7,
-            textAlign: "center",
-            marginBottom: "32px",
-            fontSize: "16px",
-            fontFamily: "ui-sans-serif, system-ui, sans-serif",
-          }}
-        >
-          Category: <span style={{ fontWeight: "600" }}>{recipe.category}</span>
+        <h1 className="text-3xl font-bold text-text-dark mb-4 text-center font-sans">{recipe.name}</h1>
+        <p className="text-base text-text-dark/70 text-center mb-8 font-sans">
+          Category: <span className="font-semibold">{recipe.category}</span>
         </p>
 
         {recipe.imageUrl && (
-          <div
-            style={{
-              marginBottom: "32px",
-              borderRadius: "12px",
-              overflow: "hidden",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-            }}
-          >
+          <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
             <img
               src={recipe.imageUrl}
               alt={recipe.name}
-              style={{
-                width: "100%",
-                height: "384px",
-                objectFit: "cover",
-              }}
+              className="w-full h-96 object-cover"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = `https://placehold.co/800x600/D4EDDA/3C8A4B?text=Recipe+Image`;
@@ -293,117 +145,34 @@ const RecipeDetail = ({ recipe, onBack, onEdit, currentTheme }) => {
           }
         />
 
-        <div
-          style={{
-            marginBottom: "32px",
-            background: "rgba(255, 255, 255, 0.3)",
-            padding: "24px",
-            borderRadius: "12px",
-            border: "1px solid rgba(0, 0, 0, 0.1)",
-            boxShadow: "inset 0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-          }}
-        >
-          <h3
-            style={{
-              fontSize: "20px",
-              fontWeight: "600",
-              color: "var(--color-text)",
-              marginBottom: "16px",
-              fontFamily: "ui-sans-serif, system-ui, sans-serif",
-            }}
-          >
-            Ingredients:
-          </h3>
-          <ul
-            style={{
-              listStyleType: "disc",
-              paddingLeft: "20px",
-              color: "var(--color-text)",
-              lineHeight: "1.6",
-            }}
-          >
+        <div className="mb-8 bg-white/30 p-6 rounded-xl border border-black/10 shadow-inner">
+          <h3 className="text-xl font-semibold text-text-dark mb-4 font-sans">Ingredients:</h3>
+          <ul className="list-disc pl-5 text-text-dark leading-relaxed">
             {recipe.ingredients &&
               recipe.ingredients.map((ing, index) => (
-                <li
-                  key={index}
-                  style={{
-                    marginBottom: "4px",
-                    fontFamily: "ui-sans-serif, system-ui, sans-serif",
-                  }}
-                >
-                  {ing}
-                </li>
+                <li key={index} className="mb-1 font-sans">{ing}</li>
               ))}
           </ul>
         </div>
 
-        <div
-          style={{
-            marginBottom: "32px",
-            background: "rgba(255, 255, 255, 0.3)",
-            padding: "24px",
-            borderRadius: "12px",
-            border: "1px solid rgba(0, 0, 0, 0.1)",
-            boxShadow: "inset 0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-          }}
-        >
-          <h3
-            style={{
-              fontSize: "20px",
-              fontWeight: "600",
-              color: "var(--color-text)",
-              marginBottom: "16px",
-              fontFamily: "ui-sans-serif, system-ui, sans-serif",
-            }}
-          >
-            Instructions:
-          </h3>
-          <ol
-            style={{
-              listStyleType: "decimal",
-              paddingLeft: "20px",
-              color: "var(--color-text)",
-              lineHeight: "1.6",
-            }}
-          >
+        <div className="mb-8 bg-white/30 p-6 rounded-xl border border-black/10 shadow-inner">
+          <h3 className="text-xl font-semibold text-text-dark mb-4 font-sans">Instructions:</h3>
+          <ol className="list-decimal pl-5 text-text-dark leading-relaxed">
             {recipe.instructions &&
               recipe.instructions.map((inst, index) => (
-                <li
-                  key={index}
-                  style={{
-                    marginBottom: "8px",
-                    fontFamily: "ui-sans-serif, system-ui, sans-serif",
-                  }}
-                >
-                  {inst}
-                </li>
+                <li key={index} className="mb-2 font-sans">{inst}</li>
               ))}
           </ol>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "32px",
-          }}
-        >
+        <div className="flex justify-center mt-8">
           <Button
             onClick={() => setShowShareModal(true)}
             variant="outline"
             size="md"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
+            className="flex items-center gap-2"
           >
-            <svg
-              style={{ width: "20px", height: "20px" }}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -414,18 +183,8 @@ const RecipeDetail = ({ recipe, onBack, onEdit, currentTheme }) => {
             Share Recipe
           </Button>
         </div>
-        <div
-          style={{
-            textAlign: "center",
-            fontSize: "14px",
-            color: "var(--color-text)",
-            opacity: 0.5,
-            marginTop: "24px",
-            fontFamily: "ui-monospace, monospace",
-          }}
-        >
-          Recipe created by User ID:{" "}
-          <span style={{ wordBreak: "break-all" }}>{recipe.userId}</span>
+        <div className="text-center text-sm text-text-dark/50 mt-6 font-mono">
+          Recipe created by User ID: <span className="break-all">{recipe.userId}</span>
         </div>
       </div>
     </main>

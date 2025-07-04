@@ -11,13 +11,13 @@ export const THEME_PALETTES = {
   },
   "azure-sunset": {
     background: "#f0f8ff", // Alice Blue
-    primary: "#4682b4",   // Steel Blue
+    primary: "#4682b4", // Steel Blue
     secondary: "#ff7f50", // Coral
-    accent: "#ff7f50",    // Use Coral for accent as well
-    text: "#1a1a2e",      // Deep Indigo
-    border: "#2f4f4f",   // Dark Slate Gray
-    card: "#f0f8ff",     // Use background for cards
-    error: "#d36060",     // Error Red (existing definition)
+    accent: "#ff7f50", // Use Coral for accent as well
+    text: "#1a1a2e", // Deep Indigo
+    border: "#2f4f4f", // Dark Slate Gray
+    card: "#f0f8ff", // Use background for cards
+    error: "#d36060", // Error Red (existing definition)
   },
   "emerald-bloom": {
     background: "#f5f5f5",
@@ -94,10 +94,47 @@ export const withAlpha = (color, alpha) => {
   return color;
 };
 
+// Helper function to convert color to RGB values
+const getRGBValues = (color) => {
+  if (!color) return "0, 0, 0";
+
+  if (color.startsWith("#")) {
+    let hex = color.replace("#", "");
+    if (hex.length === 3) {
+      hex = hex
+        .split("")
+        .map((x) => x + x)
+        .join("");
+    }
+    const num = parseInt(hex, 16);
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    return `${r}, ${g}, ${b}`;
+  }
+
+  if (color.startsWith("rgb(")) {
+    return color.replace("rgb(", "").replace(")", "");
+  }
+
+  if (color.startsWith("rgba(")) {
+    const values = color.replace("rgba(", "").replace(")", "").split(",");
+    return `${values[0]}, ${values[1]}, ${values[2]}`;
+  }
+
+  return "0, 0, 0";
+};
+
 export const setThemeCSSVariables = (theme) => {
   if (!theme) return;
   const root = document.documentElement;
+
   Object.entries(theme).forEach(([key, value]) => {
+    // Set the color variable
     root.style.setProperty(`--color-${key}`, value);
+
+    // Set the RGB variable for rgba() usage
+    const rgbValues = getRGBValues(value);
+    root.style.setProperty(`--color-${key}-rgb`, rgbValues);
   });
 };
