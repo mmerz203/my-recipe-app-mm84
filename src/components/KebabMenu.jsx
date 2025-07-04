@@ -6,12 +6,14 @@ import { CookbookLogoIcon } from "./icons/WinsomeIcons";
 const cn = (...classes) => classes.filter(Boolean).join(" ");
 
 // Kebab (three dots) icon
-const KebabIcon = ({ className = "", ...props }) => (
+const KebabIcon = ({ className = "", color = "currentColor", ...props }) => (
   <svg
-    className={cn("w-5 h-5 text-text-dark", className)}
-    fill="currentColor"
+    className={cn("w-5 h-5 transition-colors duration-200", className)}
+    fill={color}
     viewBox="0 0 20 20"
     aria-hidden="true"
+    role="img"
+    aria-label="Menu"
     {...props}
   >
     <circle cx="10" cy="4" r="1.5" />
@@ -24,6 +26,7 @@ const KebabMenu = ({
   items = [],
   onSelect = () => {},
   className = "",
+  triggerIcon,
   ...props
 }) => {
   const [open, setOpen] = useState(false);
@@ -34,14 +37,22 @@ const KebabMenu = ({
         <button
           className={cn(
             "w-10 h-10 bg-primary-brand rounded-xl flex items-center justify-center shadow-md",
-            "hover:scale-105 transition-transform",
+            "hover:scale-105 hover:shadow-lg transition-all duration-200",
             "focus:outline-none focus:ring-2 focus:ring-primary-brand focus:ring-offset-2",
-            className
+            "active:scale-95 active:shadow-sm",
+            "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
+            className,
           )}
           aria-label="Open menu"
+          aria-expanded={open}
+          aria-haspopup="true"
           type="button"
         >
-          <CookbookLogoIcon className="w-6 h-6 text-white" />
+          {triggerIcon ? (
+            triggerIcon
+          ) : (
+            <KebabIcon className="w-6 h-6" color="white" />
+          )}
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
@@ -53,7 +64,7 @@ const KebabMenu = ({
             "animate-fade-in",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-brand",
             "!bg-[color:var(--color-card)] !backdrop-blur-none !bg-opacity-100",
-            className
+            className,
           )}
           sideOffset={8}
         >
@@ -74,7 +85,7 @@ const KebabMenu = ({
                   "focus:outline-none data-[highlighted]:bg-primary-brand data-[highlighted]:text-white",
                   item.destructive
                     ? "text-error hover:bg-error/10 data-[highlighted]:bg-error data-[highlighted]:text-white"
-                    : "text-text-dark hover:bg-primary-brand/10"
+                    : "text-text-dark hover:bg-primary-brand/10",
                 )}
               >
                 {item.icon && (
@@ -82,7 +93,7 @@ const KebabMenu = ({
                 )}
                 {item.label}
               </DropdownMenu.Item>
-            )
+            ),
           )}
           <DropdownMenu.Arrow className="fill-card" />
         </DropdownMenu.Content>

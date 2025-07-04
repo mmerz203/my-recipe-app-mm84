@@ -4,8 +4,10 @@ import { CookbookLogoIcon, SettingsIcon } from "./icons/WinsomeIcons";
 import { UserPreferencesContext } from "../contexts/UserPreferencesContext";
 
 import Button from "./ui/Button";
+import IconButton from "./ui/IconButton";
 import KebabMenu from "./KebabMenu";
 import { getThemeColors } from "../utils/themeSystem";
+import { ICON_SIZES } from "../utils/iconUtils";
 
 const fontFamily =
   'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
@@ -14,6 +16,7 @@ const Header = ({ onSettings, currentTheme: propTheme }) => {
   const { preferences } = useContext(UserPreferencesContext);
   const currentTheme = propTheme || getThemeColors(preferences);
   const cookbookName = preferences.cookbookName || "Winsome Designs";
+
   return (
     <header
       style={{
@@ -38,8 +41,7 @@ const Header = ({ onSettings, currentTheme: propTheme }) => {
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center" }}>
           <div className="relative flex items-center">
-            {/* KebabMenu temporarily disabled for main branch polish */}
-            {/*
+            {/* KebabMenu enabled for all pages, using static CookbookLogoIcon as trigger */}
             <KebabMenu
               items={[
                 { label: "Profile", key: "profile" },
@@ -54,11 +56,13 @@ const Header = ({ onSettings, currentTheme: propTheme }) => {
                 }
               }}
               className="z-20"
+              triggerIcon={
+                <CookbookLogoIcon
+                  className="w-8 h-8 text-white"
+                  color="white"
+                />
+              }
             />
-            */}
-            <span className="absolute left-0 top-0 w-10 h-10 bg-primary-brand rounded-xl flex items-center justify-center shadow-md pointer-events-none">
-              <CookbookLogoIcon className="w-6 h-6 text-white" />
-            </span>
             <div style={{ marginLeft: "52px" }}>
               <h1
                 style={{
@@ -92,7 +96,11 @@ const Header = ({ onSettings, currentTheme: propTheme }) => {
           size="md"
           className="flex items-center gap-2"
         >
-          <SettingsIcon style={{ width: 20, height: 20 }} color="#fff" />
+          <SettingsIcon
+            className="w-5 h-5"
+            color="currentColor"
+            aria-hidden="true"
+          />
           <span className="hidden sm:inline font-medium">Settings</span>
         </Button>
       </div>

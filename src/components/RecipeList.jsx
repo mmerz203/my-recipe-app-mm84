@@ -1,10 +1,24 @@
 // Complete Recipe List Page - Exact Winsome Designs Implementation
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useMemo } from "react";
 import { RecipeContext } from "../contexts/RecipeContext";
 import { AuthContext } from "../contexts/AuthContext";
 import LoadingSpinner from "./LoadingSpinner";
 import Button from "./ui/Button";
 import Modal from "./Modal";
+// Dietary and cooking time filter options
+const dietaryOptions = ["Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free"];
+const cookingTimeOptions = [
+  { label: "Any", value: "" },
+  { label: "Under 30 min", value: "under-30" },
+  { label: "30-60 min", value: "30-60" },
+  { label: "Over 1 hour", value: "over-60" },
+];
+
+const getCookingTimeRange = (minutes) => {
+  if (minutes <= 30) return "under-30";
+  if (minutes <= 60) return "30-60";
+  return "over-60";
+};
 
 // Back Arrow Icon
 const BackIcon = ({ size = 18 }) => (
@@ -103,6 +117,27 @@ const RecipeList = ({
   const [showFilters, setShowFilters] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [recipeToDelete, setRecipeToDelete] = useState(null);
+  // New filter states
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterDietary, setFilterDietary] = useState([]); // array of strings
+  const [filterCookingTime, setFilterCookingTime] = useState("");
+
+  // Handle dietary checkbox toggle
+  const handleDietaryChange = (option) => {
+    setFilterDietary((prev) =>
+      prev.includes(option)
+        ? prev.filter((d) => d !== option)
+        : [...prev, option]
+    );
+  };
+
+  // Clear all filters
+  const handleClearFilters = () => {
+    setFilterCategory("");
+    setSearchTerm("");
+    setFilterDietary([]);
+    setFilterCookingTime("");
+  };
 
   // Ensure global theme variables are set when this component is rendered
   React.useEffect(() => {
@@ -114,15 +149,44 @@ const RecipeList = ({
     }
   }, [currentTheme]);
 
-  const filteredRecipes =
-    recipes?.filter(
-      (recipe) =>
-        recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (recipe.ingredients &&
-          recipe.ingredients.some((ing) =>
-            ing.toLowerCase().includes(searchTerm.toLowerCase()),
-          )),
-    ) || [];
+  // Enhanced filtering logic
+  const filteredRecipes = useMemo(() => {
+    return (
+      recipes?.filter((recipe) => {
+        // Category filter
+        if (filterCategory && recipe.category !== filterCategory) return false;
+        // Dietary restrictions (all selected must be present)
+        if (
+          filterDietary.length > 0 &&
+          !filterDietary.every((d) => (recipe.dietary || []).includes(d))
+        )
+          return false;
+        // Cooking time
+        if (
+          filterCookingTime &&
+          getCookingTimeRange(recipe.cookingTime || 0) !== filterCookingTime
+        )
+          return false;
+        // Search term (name, main ingredient, or ingredients)
+        if (
+          searchTerm &&
+          !(
+            recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (recipe.mainIngredient &&
+              recipe.mainIngredient
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase())) ||
+            (recipe.ingredients &&
+              recipe.ingredients.some((ing) =>
+                ing.toLowerCase().includes(searchTerm.toLowerCase())
+              ))
+          )
+        )
+          return false;
+        return true;
+      }) || []
+    );
+  }, [recipes, filterCategory, filterDietary, filterCookingTime, searchTerm]);
 
   console.log("RecipeList: currentTheme prop:", currentTheme);
 
@@ -179,7 +243,7 @@ const RecipeList = ({
         </div>
       </header>
 
-      {/* Search & Filter Section - Exact Specifications */}
+      {/* Search & Filter Section - Enhanced */}
       <section className="max-w-6xl mx-auto px-4 py-8 mb-8">
         <div className="flex flex-col sm:flex-row gap-4 items-start">
           {/* Search Input Container */}
@@ -207,6 +271,79 @@ const RecipeList = ({
             Filter
           </Button>
         </div>
+        {/* Filters Panel */}
+        {showFilters && (
+          <div className="mt-6 w-full bg-card border border-neutral-subtle rounded-lg p-4 flex flex-col gap-4">
+            {/* Category Dropdown */}
+            <div>
+              <label className="block text-sm font-medium text-text-dark mb-1">
+                Category
+              </label>
+              <select
+                className="w-full border border-neutral-subtle rounded px-3 py-2 bg-background text-text-dark"
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+              >
+                <option value="">All</option>
+                {[...(recipes ? Array.from(new Set(recipes.map(r => r.category)).values()) : [])].filter(Boolean).map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Dietary Restrictions */}
+            <div>
+              <label className="block text-sm font-medium text-text-dark mb-1">
+                Dietary Restrictions
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {dietaryOptions.map((option) => (
+                  <label
+                    key={option}
+                    className="flex items-center gap-2 text-sm text-text-dark"
+                  >
+                    <input
+                      type="checkbox"
+                      className="accent-primary-brand"
+                      checked={filterDietary.includes(option)}
+                      onChange={() => handleDietaryChange(option)}
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+            </div>
+            {/* Cooking Time Dropdown */}
+            <div>
+              <label className="block text-sm font-medium text-text-dark mb-1">
+                Cooking Time
+              </label>
+              <select
+                className="w-full border border-neutral-subtle rounded px-3 py-2 bg-background text-text-dark"
+                value={filterCookingTime}
+                onChange={(e) => setFilterCookingTime(e.target.value)}
+              >
+                {cookingTimeOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Clear All Filters Button */}
+            <div>
+              <Button
+                type="button"
+                variant="secondary"
+                className="btn-secondary mt-2"
+                onClick={handleClearFilters}
+              >
+                Clear All Filters
+              </Button>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Main Content */}

@@ -8,11 +8,13 @@ import {
 } from "../utils/themeSystem";
 import Button from "./ui/Button";
 
+import { CookbookLogoIcon } from "./icons/WinsomeIcons";
+import { AddRecipeIcon, ViewAllRecipesIcon, SettingsIcon } from "./icons/WinsomeIcons";
+
 // Exact font family from specifications
 const fontFamily =
   'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
 
-// Exact Custom Icons with DOM specifications
 const CookbookIcon = ({ size = 24 }) => (
   <svg
     width={size}
@@ -28,71 +30,6 @@ const CookbookIcon = ({ size = 24 }) => (
     <circle cx="7" cy="7" r="0.5" fill="rgb(16, 8, 43)" />
     <circle cx="7" cy="11" r="0.5" fill="rgb(16, 8, 43)" />
     <circle cx="7" cy="15" r="0.5" fill="rgb(16, 8, 43)" />
-  </svg>
-);
-
-const PlusIcon = ({ size = 32 }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="white"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-  >
-    <path d="M12 5v14M5 12h14" />
-  </svg>
-);
-
-const SettingsIcon = ({ size = 18 }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="rgb(16, 8, 43)"
-    strokeWidth="2"
-  >
-    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 0 2l.15.25a2 2 0 0 1 0 2l-.15.25a2 2 0 0 0 0 2l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0 0-2l-.15-.25a2 2 0 0 1 0-2l.15-.25a2 2 0 0 0 0-2l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-    <circle cx="12" cy="12" r="3" />
-  </svg>
-);
-
-// Recipe Book Icon for View All Recipes (Dark color as specified)
-const ViewIcon = ({ size = 32 }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="rgb(16, 8, 43)"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-    <path d="M8 7h8M8 11h8M8 15h6" />
-    <circle cx="7" cy="7" r="0.5" fill="rgb(16, 8, 43)" />
-    <circle cx="7" cy="11" r="0.5" fill="rgb(16, 8, 43)" />
-    <circle cx="7" cy="15" r="0.5" fill="rgb(16, 8, 43)" />
-  </svg>
-);
-
-const CustomizeIcon = ({ size = 32 }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="white"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="3" />
-    <path d="m12 1 2.09 4.26L18 6.27l-1.81 3.37L20 12l-3.81 2.36L18 17.73l-3.91 1.01L12 23l-2.09-4.26L6 17.73l1.81-3.37L4 12l3.81-2.36L6 6.27l3.91-1.01L12 1z" />
   </svg>
 );
 
@@ -202,7 +139,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               (e.target.style.backgroundColor = "transparent")
             }
           >
-            <SettingsIcon size={18} />
+            <SettingsIcon className="w-5 h-5" color="var(--color-text)" />
           </button>
         </div>
       </header>
@@ -337,7 +274,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               onMouseEnter={(e) => (e.target.style.transform = "scale(1.1)")}
               onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
             >
-              <ViewIcon size={32} />
+              <ViewAllRecipesIcon className="w-8 h-8" color="white" />
             </div>
 
             {/* Card Title */}
@@ -455,7 +392,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               onMouseEnter={(e) => (e.target.style.transform = "scale(1.1)")}
               onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
             >
-              <PlusIcon size={32} />
+              <AddRecipeIcon className="w-8 h-8" color="white" />
             </div>
             <h3
               style={{
@@ -565,7 +502,7 @@ const ExactHomepage = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
               onMouseEnter={(e) => (e.target.style.transform = "scale(1.1)")}
               onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
             >
-              <CustomizeIcon size={32} />
+              <SettingsIcon className="w-8 h-8" color="white" />
             </div>
             <h3
               style={{

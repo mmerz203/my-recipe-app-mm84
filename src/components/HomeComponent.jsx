@@ -4,11 +4,8 @@ import { UserPreferencesContext } from "../contexts/UserPreferencesContext";
 import { RecipeContext } from "../contexts/RecipeContext";
 import Button from "./ui/Button";
 import Card from "./ui/Card";
-import {
-  ViewAllRecipesIcon,
-  AddRecipeIcon,
-  CustomizeIcon,
-} from "./icons/WinsomeIcons";
+import { AddRecipeIcon, CustomizeIcon } from "./icons/WinsomeIcons";
+import { ViewAllRecipesIcon } from "./icons/WinsomeIcons";
 
 const HomeComponent = ({ onAddRecipe, onViewAllRecipes, onCustomize }) => {
   const { preferences } = useContext(UserPreferencesContext);
